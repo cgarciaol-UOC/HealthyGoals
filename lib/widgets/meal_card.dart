@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:healty_goals/screens/meal_info.dart';
+
+import '../screens/change_receipe.dart';
 
 class MealCard extends StatelessWidget {
   final String title;
@@ -11,22 +14,26 @@ class MealCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.imageUrl,
-    this.badgeColor = const Color(0x59F29833),
+    this.badgeColor = const Color(0x59000000),
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 336,
-      height: 106,
-      child: Stack(
+    return GestureDetector(
+        onTap: () {
+      // Navegar a la página Meal al hacer clic en la tarjeta
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MealScreen()),
+      );
+    },
+    child: Container(
+    constraints: BoxConstraints(maxWidth: 336, maxHeight: 110),
+    child: Stack(
         children: [
-          Positioned(
-            left: 0,
-            top: 0,
+          // Fondo blanco con sombra
+          Positioned.fill(
             child: Container(
-              width: 336,
-              height: 106,
               decoration: ShapeDecoration(
                 color: Colors.white,
                 shape: RoundedRectangleBorder(
@@ -43,12 +50,27 @@ class MealCard extends StatelessWidget {
               ),
             ),
           ),
+          // Botón de editar en la esquina superior derecha
           Positioned(
-            left: 8.97,
-            top: 11.36,
+            top: 10,
+            right: 10,
+            child: IconButton(
+              icon: Icon(Icons.edit, color: Colors.grey),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ChangeRecipeScreen()),
+                );
+              },
+            ),
+          ),
+          // Badge con color personalizado
+          Positioned(
+            left: 9,
+            top: 11,
             child: Container(
-              width: 79.38,
-              height: 43.91,
+              width: 70,
+              height: 50,
               decoration: ShapeDecoration(
                 color: badgeColor,
                 shape: RoundedRectangleBorder(
@@ -57,44 +79,32 @@ class MealCard extends StatelessWidget {
               ),
             ),
           ),
+          // Título dentro del badge
           Positioned(
-            left: 8.97,
-            top: 27.54,
+            left: 12,
+            top: 28,
             child: SizedBox(
-              width: 84.75,
-              height: 12.33,
+              width: 70,
+              height: 30,
               child: Text(
                 title,
                 style: const TextStyle(
                   color: Color(0xFF45484D),
-                  fontSize: 16,
-                  fontFamily: 'Poppins',
+                  fontSize: 14,
+                  fontFamily: 'Montserrat',
                   fontWeight: FontWeight.w600,
                   height: 1,
                 ),
               ),
             ),
           ),
+          // Contenedor de la imagen
           Positioned(
-            left: 153.54,
-            top: 4.54,
+            left: 112,
+            top: 10,
             child: Container(
-              width: 148.56,
-              height: 64.72,
-              decoration: ShapeDecoration(
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 132.46,
-            top: -61.48,
-            child: Container(
-              width: 179.23,
-              height: 181.87,
+              width: 140,
+              height: 70,
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: NetworkImage(imageUrl),
@@ -103,17 +113,18 @@ class MealCard extends StatelessWidget {
               ),
             ),
           ),
+          // Subtítulo debajo de la imagen
           Positioned(
-            left: 153.54,
-            top: 69.54,
+            left: 113,
+            top: 80,
             child: SizedBox(
-              width: 148.56,
-              height: 18.66,
+              width: 148,
+              height: 25,
               child: Text(
                 subtitle,
                 style: const TextStyle(
                   color: Colors.black,
-                  fontSize: 16,
+                  fontSize: 15,
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w600,
                 ),
@@ -122,6 +133,8 @@ class MealCard extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
+
   }
 }

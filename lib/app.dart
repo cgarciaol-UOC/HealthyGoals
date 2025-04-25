@@ -1,42 +1,81 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:healty_goals/screens/auth_screen.dart';
+import 'package:healty_goals/screens/change_receipe.dart';
+import 'package:healty_goals/screens/chat_screen.dart';
+import 'package:healty_goals/screens/meal_info.dart';
+import 'package:healty_goals/screens/meal_plan_screen.dart';
+import 'package:healty_goals/screens/workout_screen.dart';
+import 'package:healty_goals/widgets/settings_notifier.dart';
+import 'package:provider/provider.dart';
+import 'layouts/main_scaffold.dart';
 import 'screens/home_screen.dart';
-import 'screens/auth_screen.dart';
-import 'screens/fridge_screen.dart';
-import 'screens/recipes_screen.dart';
-import 'screens/diet_screen.dart';
-import 'screens/shopping_list_screen.dart';
-import 'screens/workout_screen.dart';
-import 'screens/results_screen.dart';
-import 'util.dart';
-import 'theme.dart';
+import 'screens/settings_screen.dart';
+import 'bottom_navigation.dart';
 
 final GoRouter _router = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/home',
   routes: [
-    GoRoute(path: '/', builder: (context, state) => AuthScreen()),
-    GoRoute(path: '/home', builder: (context, state) => HomeScreen()),
-    GoRoute(path: '/fridge', builder: (context, state) => FridgeScreen()),
-    GoRoute(path: '/diet', builder: (context, state) => DietScreen()),
-    GoRoute(path: '/results', builder: (context, state) => ResultsScreen()),
+    ShellRoute(
+      builder: (context, state, child) {
+        return MainScaffold(child: child); // Aquí vive la bottom bar
+      },
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => const HomeScreen(day: 'Monday', meals: [], ),
+        ),
+        GoRoute(
+          path: '/home',
+          builder: (context, state) => const HomeScreen(day: 'Monday', meals: [],),
+        ),
+        GoRoute(
+          path: '/mealplan',
+          builder: (context, state) => const MealPlanScreen(),
+        ),
+        GoRoute(
+          path: '/changereceipe',
+          builder: (context, state) => const ChangeRecipeScreen(),
+        ),
+        GoRoute(
+          path: '/receipe',
+          builder: (context, state) => const MealScreen(),
+        ),
+        GoRoute(
+          path: '/workout',
+          builder: (context, state) => const WorkoutScreen(),
+        ),
+        GoRoute(
+          path: '/chat',
+          builder: (context, state) => const ChatScreen(),
+        ),
+        GoRoute(
+          path: '/settings',
+          builder: (context, state) => SettingsScreen(),
+        ),
+      ],
+    ),
   ],
 );
 
-class MyApp extends StatelessWidget {
+class HealthyGoalsApp extends StatelessWidget {
+  const HealthyGoalsApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    final brightness = View.of(context).platformDispatcher.platformBrightness;
-
-    // Retrieves the default theme for the platform
-    //TextTheme textTheme = Theme.of(context).textTheme;
-
-    // Use with Google Fonts package to use downloadable fonts
-    TextTheme textTheme = createTextTheme(context, "Montserrat", "Montserrat");
-
-    MaterialTheme theme = MaterialTheme(textTheme);
     return MaterialApp.router(
       title: 'Healthy Goals',
-      theme: brightness == Brightness.light ? theme.light() : theme.dark(),
+      theme: ThemeData.light().copyWith(
+        primaryColor: const Color(0xFFF27E33),
+        appBarTheme: const AppBarTheme(color: Color(0xFFFFFFFF)),
+      ),
+      darkTheme: ThemeData.dark().copyWith(
+        primaryColor: const Color(0xFFF27E33),
+        appBarTheme: const AppBarTheme(color: Color(0xFF3E3C3C)),
+      ),
+      themeMode: Provider.of<SettingsNotifier>(context).isDarkModeEnabled
+          ? ThemeMode.dark
+          : ThemeMode.light,
       routerConfig: _router,
     );
   }

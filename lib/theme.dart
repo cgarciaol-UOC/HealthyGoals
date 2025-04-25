@@ -335,22 +335,61 @@ class MaterialTheme {
     return theme(darkHighContrastScheme());
   }
 
-
   ThemeData theme(ColorScheme colorScheme) => ThemeData(
-     useMaterial3: true,
-     brightness: colorScheme.brightness,
-     colorScheme: colorScheme,
-     textTheme: textTheme.apply(
-       bodyColor: colorScheme.onSurface,
-       displayColor: colorScheme.onSurface,
-     ),
-     scaffoldBackgroundColor: colorScheme.background,
-     canvasColor: colorScheme.surface,
+    useMaterial3: true,
+    brightness: colorScheme.brightness,
+    colorScheme: colorScheme,
+    textTheme: textTheme.apply(
+      bodyColor: colorScheme.onSurface,
+      displayColor: colorScheme.onSurface,
+    ),
+    scaffoldBackgroundColor: colorScheme.background,
+    canvasColor: colorScheme.surface,
   );
 
+  /// Custom Color 1
+  static const customColor1 = ExtendedColor(
+    seed: Color(0xff0bb622),
+    value: Color(0xff00b46d),
+    light: ColorFamily(
+      color: Color(0xff006d40),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xff00b46d),
+      onColorContainer: Color(0xff003d22),
+    ),
+    lightMediumContrast: ColorFamily(
+      color: Color(0xff006d40),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xff00b46d),
+      onColorContainer: Color(0xff003d22),
+    ),
+    lightHighContrast: ColorFamily(
+      color: Color(0xff006d40),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xff00b46d),
+      onColorContainer: Color(0xff003d22),
+    ),
+    dark: ColorFamily(
+      color: Color(0xff4fdf93),
+      onColor: Color(0xff00391f),
+      colorContainer: Color(0xff00b46d),
+      onColorContainer: Color(0xff003d22),
+    ),
+    darkMediumContrast: ColorFamily(
+      color: Color(0xff4fdf93),
+      onColor: Color(0xff00391f),
+      colorContainer: Color(0xff00b46d),
+      onColorContainer: Color(0xff003d22),
+    ),
+    darkHighContrast: ColorFamily(
+      color: Color(0xff4fdf93),
+      onColor: Color(0xff00391f),
+      colorContainer: Color(0xff00b46d),
+      onColorContainer: Color(0xff003d22),
+    ),
+  );
 
-  List<ExtendedColor> get extendedColors => [
-  ];
+  List<ExtendedColor> get extendedColors => [customColor1];
 }
 
 class ExtendedColor {

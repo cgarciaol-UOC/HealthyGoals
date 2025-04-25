@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import '../bottom_navigation.dart';
-import '../providers/meal_card_provider.dart';
+import '../top_bar.dart';
+import '../widgets/meal_card.dart';
 
-class WorkoutScreen extends StatefulWidget {
-  const WorkoutScreen({Key? key}) : super(key: key);
+class ChatScreen extends StatefulWidget {
+  const ChatScreen({Key? key}) : super(key: key);
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<WorkoutScreen> {
+class _HomeScreenState extends State<ChatScreen> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
@@ -22,9 +23,7 @@ class _HomeScreenState extends State<WorkoutScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Healthy Goals'),
-      ),
+      appBar: const CommonAppBar(title: 'Healthy Goals', showBackButton: true),
       body: Container(
         color: const Color(0xFFFBFBFB),
         child: ListView(
@@ -39,36 +38,8 @@ class _HomeScreenState extends State<WorkoutScreen> {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 20),
-            MealCard(
-              title: 'Desayuno',
-              subtitle: 'Avena con frutas',
-              imageUrl: 'https://placehold.co/179x182?text=Desayuno',
-            ),
-            const SizedBox(height: 16),
-            MealCard(
-              title: 'Comida',
-              subtitle: 'Ensalada y tofu',
-              imageUrl: 'https://placehold.co/179x182?text=Comida',
-            ),
-            const SizedBox(height: 16),
-            MealCard(
-              title: 'Merienda',
-              subtitle: 'Yogur y nueces',
-              imageUrl: 'https://placehold.co/179x182?text=Merienda',
-            ),
-            const SizedBox(height: 16),
-            MealCard(
-              title: 'Cena',
-              subtitle: 'Sopa de verduras',
-              imageUrl: 'https://placehold.co/179x182?text=Cena',
-            ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigation(
-        selectedIndex: _selectedIndex,
-        onItemTapped: _onItemTapped,
       ),
     );
   }

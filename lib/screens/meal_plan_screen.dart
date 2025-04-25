@@ -1,89 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import '../bottom_navigation.dart';
+import '../top_bar.dart';
+import '../widgets/daily_meal_card.dart';
+import '../widgets/meal_card.dart';
 
-class AuthScreen extends StatefulWidget {
+class MealPlanScreen extends StatefulWidget {
+  const MealPlanScreen({Key? key}) : super(key: key);
+
   @override
-  _AuthScreenState createState() => _AuthScreenState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _isLogin = true;
-  bool _isLoggated = false;
+class _HomeScreenState extends State<MealPlanScreen> {
+  int _selectedIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _checkLoginStatus();
-  }
-
-  Future<void> _checkLoginStatus() async {
-    // Simulate checking login status (replace with your actual logic)
-    await Future.delayed(Duration(seconds: 2)); // Simulate a delay
-    bool loggedIn = true; // Replace with your actual login check
+  void _onItemTapped(int index) {
     setState(() {
-      _isLoggated = loggedIn;
+      _selectedIndex = index;
     });
-  }
-
-  void _toggleAuthMode() {
-    setState(() {
-      _isLogin = !_isLogin;
-    });
-  }
-
-  void _submit() {
-    //TODO CHECK credentials
-    context.go('/home');
+    // Aquí puedes manejar la navegación entre pantallas
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoggated) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go('/home');
-      });
-      return Container();
-    } else {
-      return Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(_isLogin ? 'Iniciar Sesión' : 'Registrarse',
-                    style: TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold)),
-                SizedBox(height: 20),
-                TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(labelText: 'Correo electrónico'),
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                SizedBox(height: 10),
-                TextField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(labelText: 'Contraseña'),
-                  obscureText: true,
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _submit,
-                  child: Text(_isLogin ? 'Iniciar sesión' : 'Registrarse'),
-                ),
-                TextButton(
-                  onPressed: _toggleAuthMode,
-                  child: Text(_isLogin
-                      ? '¿No tienes cuenta? Regístrate'
-                      : '¿Ya tienes cuenta? Inicia sesión'),
-                ),
-              ],
-            ),
-          ),
+    return Scaffold(
+      appBar: const CommonAppBar(title: 'Healthy Goals', showBackButton: true),
+      body: Container(
+        color: const Color(0xFFFBFBFB),
+        child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          children: [
+            DailyMealCard(day: 'Monday', description: 'Lorem ipsum dolor sit amet'),
+            DailyMealCard(day: 'Tuesday', description: 'Consectetur adipiscing elit'),
+            DailyMealCard(day: 'Wednesday', description: 'Sed do eiusmod tempor incididunt'),
+            DailyMealCard(day: 'Thursday', description: 'Ut enim ad minim veniam'),
+            DailyMealCard(day: 'Friday', description: 'Quis nostrud exercitation ullamco laboris'),
+            DailyMealCard(day: 'Saturday', description: 'Duis aute irure dolor in reprehenderit'),
+            DailyMealCard(day: 'Sunday', description: 'Excepteur sint occaecat cupidatat non proident'),
+          ],
         ),
-      );
-    }
+      ),
+    );
   }
 }
