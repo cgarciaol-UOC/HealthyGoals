@@ -7,27 +7,38 @@ import 'package:healty_goals/screens/meal_info.dart';
 import 'package:healty_goals/screens/meal_plan_screen.dart';
 import 'package:healty_goals/screens/workout_screen.dart';
 import 'package:healty_goals/widgets/settings_notifier.dart';
+import 'package:healty_goals/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'layouts/main_scaffold.dart';
 import 'screens/home_screen.dart';
 import 'screens/settings_screen.dart';
-import 'bottom_navigation.dart';
 
 final GoRouter _router = GoRouter(
-  initialLocation: '/home',
+  initialLocation: '/',
+  refreshListenable: AuthServiceListener(),
+  redirect: (context, state) {
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final isLoggedIn = authService.isLoggedIn;
+
+    if (!isLoggedIn && state.matchedLocation != '/') {
+      return '/';
+    }
+
+    if (isLoggedIn && state.matchedLocation == '/') {
+      return '/home';
+    }
+
+    return null;
+  },
   routes: [
+    GoRoute(path: '/', builder: (context, state) => const AuthScreen()),
     ShellRoute(
-      builder: (context, state, child) {
-        return MainScaffold(child: child); // Aquí vive la bottom bar
-      },
+      builder: (context, state, child) => MainScaffold(child: child),
       routes: [
         GoRoute(
-          path: '/',
-          builder: (context, state) => const HomeScreen(day: 'Monday', meals: [], ),
-        ),
-        GoRoute(
           path: '/home',
-          builder: (context, state) => const HomeScreen(day: 'Monday', meals: [],),
+          builder:
+              (context, state) => const HomeScreen(day: 'Monday', meals: []),
         ),
         GoRoute(
           path: '/mealplan',
@@ -45,10 +56,7 @@ final GoRouter _router = GoRouter(
           path: '/workout',
           builder: (context, state) => const WorkoutScreen(),
         ),
-        GoRoute(
-          path: '/chat',
-          builder: (context, state) => const ChatScreen(),
-        ),
+        GoRoute(path: '/chat', builder: (context, state) => const ChatScreen()),
         GoRoute(
           path: '/settings',
           builder: (context, state) => SettingsScreen(),
@@ -73,10 +81,25 @@ class HealthyGoalsApp extends StatelessWidget {
         primaryColor: const Color(0xFFF27E33),
         appBarTheme: const AppBarTheme(color: Color(0xFF3E3C3C)),
       ),
-      themeMode: Provider.of<SettingsNotifier>(context).isDarkModeEnabled
-          ? ThemeMode.dark
-          : ThemeMode.light,
+      themeMode:
+          Provider.of<SettingsNotifier>(context).isDarkModeEnabled
+              ? ThemeMode.dark
+              : ThemeMode.light,
       routerConfig: _router,
     );
+  }
+}
+
+class AuthServiceListener extends ChangeNotifier {
+  AuthServiceListener() {
+    _authService.addListener(notifyListeners);
+  }
+
+  final _authService = AuthService();
+
+  @override
+  void dispose() {
+    _authService.removeListener(notifyListeners);
+    super.dispose();
   }
 }

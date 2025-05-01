@@ -49,10 +49,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     // Si el día recibido no es hoy, mostramos el botón de retroceso
-    //bool isToday = widget.day == DateFormat('yyyy-MM-dd').format(DateTime.now());
+    bool isToday = false; //widget.day == DateFormat('yyyy-MM-dd').format(DateTime.now());
     return Scaffold(
       appBar:
-      //!isToday? const CommonAppBar(title: 'Healthy Goals', showBackButton: true) :
+      !isToday? const CommonAppBar(title: 'Healthy Goals', showBackButton: true) :
         const CommonAppBar(title: 'Healthy Goals'),
       body: Container(
         color: const Color(0xFFFBFBFB),

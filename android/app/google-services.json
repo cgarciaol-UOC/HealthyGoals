@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "837161346472",
+    "project_id": "healthygoals-ab2ea",
+    "storage_bucket": "healthygoals-ab2ea.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:837161346472:android:2513621c6d52dc1adaa99d",
+        "android_client_info": {
+          "package_name": "com.example.healty_goals"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCK_thSvNLr7IOgL9SGUmHbni6ZZDnwEtQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

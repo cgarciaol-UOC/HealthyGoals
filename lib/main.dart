@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:healty_goals/widgets/settings_notifier.dart';
+import 'package:healty_goals/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'app.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => SettingsNotifier()),
-        // Otros proveedores si es necesario...
+        ChangeNotifierProvider(create: (_) => SettingsNotifier()),
+        ChangeNotifierProvider(
+          create: (_) => AuthService(),
+        ), // lo añadimos aquí
       ],
       child: const HealthyGoalsApp(),
     ),

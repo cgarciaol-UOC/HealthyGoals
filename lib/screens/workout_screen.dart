@@ -1,45 +1,100 @@
 import 'package:flutter/material.dart';
-import '../bottom_navigation.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../top_bar.dart';
-import '../widgets/meal_card.dart';
+import '../widgets/exercice_card.dart';
+
+class Exercise {
+  final String name;
+  final String description;
+
+  Exercise({required this.name, required this.description});
+
+  factory Exercise.fromJson(Map<String, dynamic> json) {
+    return Exercise(name: json['name'], description: json['description']);
+  }
+}
 
 class WorkoutScreen extends StatefulWidget {
   const WorkoutScreen({Key? key}) : super(key: key);
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _WorkoutScreenState createState() => _WorkoutScreenState();
 }
 
-class _HomeScreenState extends State<WorkoutScreen> {
+class _WorkoutScreenState extends State<WorkoutScreen> {
   int _selectedIndex = 0;
+  List<Exercise> exercises = [];
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
-    // Aquí puedes manejar la navegación entre pantallas
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchExercises();
+  }
+
+  Future<void> fetchExercises() async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://tu-api.com/exercises'),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        if (data.isNotEmpty) {
+          setState(() {
+            exercises = data.map((json) => Exercise.fromJson(json)).toList();
+          });
+        } else {
+          _loadFallbackExercises();
+        }
+      } else {
+        _loadFallbackExercises();
+      }
+    } catch (e) {
+      debugPrint('Error al cargar ejercicios: $e');
+      _loadFallbackExercises();
+    }
+  }
+
+  void _loadFallbackExercises() {
+    final ex = [
+      {"name": "Push Ups", "description": "3 sets of 15 reps"},
+      {"name": "Squats", "description": "3 sets of 20 reps"},
+    ];
+
+    setState(() {
+      exercises = ex.map((json) => Exercise.fromJson(json)).toList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CommonAppBar(title: 'Healthy Goals', showBackButton: true),
+      appBar: const CommonAppBar(title: 'Exercise List', showBackButton: true),
       body: Container(
         color: const Color(0xFFFBFBFB),
-        child: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-          children: [
-            const Text(
-              'Your meal planning for today',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 14,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
+        padding: const EdgeInsets.all(16),
+        child:
+            exercises.isEmpty
+                ? const Center(child: CircularProgressIndicator())
+                : ListView(
+                  children:
+                      exercises
+                          .map(
+                            (exercise) => ExerciseCard(
+                              name: exercise.name,
+                              description: exercise.description,
+                            ),
+                          )
+                          .toList(),
+                ),
       ),
     );
   }

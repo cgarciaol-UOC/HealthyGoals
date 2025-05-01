@@ -1,89 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'login_screen.dart';
+import 'signup_screen.dart';
 
 class AuthScreen extends StatefulWidget {
+  const AuthScreen({super.key});
+
   @override
-  _AuthScreenState createState() => _AuthScreenState();
+  State<AuthScreen> createState() => _AuthScreenState();
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _isLogin = true;
-  bool _isLoggated = false;
+  bool showLogin = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _checkLoginStatus();
-  }
-
-  Future<void> _checkLoginStatus() async {
-    // Simulate checking login status (replace with your actual logic)
-    await Future.delayed(Duration(seconds: 2)); // Simulate a delay
-    bool loggedIn = true; // Replace with your actual login check
+  void toggleScreen() {
     setState(() {
-      _isLoggated = loggedIn;
+      showLogin = !showLogin;
     });
-  }
-
-  void _toggleAuthMode() {
-    setState(() {
-      _isLogin = !_isLogin;
-    });
-  }
-
-  void _submit() {
-    //TODO CHECK credentials
-    context.go('/home');
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoggated) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go('/home');
-      });
-      return Container();
-    } else {
-      return Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(_isLogin ? 'Iniciar Sesión' : 'Registrarse',
-                    style: TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold)),
-                SizedBox(height: 20),
-                TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(labelText: 'Correo electrónico'),
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                SizedBox(height: 10),
-                TextField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(labelText: 'Contraseña'),
-                  obscureText: true,
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _submit,
-                  child: Text(_isLogin ? 'Iniciar sesión' : 'Registrarse'),
-                ),
-                TextButton(
-                  onPressed: _toggleAuthMode,
-                  child: Text(_isLogin
-                      ? '¿No tienes cuenta? Regístrate'
-                      : '¿Ya tienes cuenta? Inicia sesión'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
+    return Scaffold(
+      body: showLogin
+          ? LogIn(onToggle: toggleScreen)
+          : SignUp(onToggle: toggleScreen),
+    );
   }
 }
