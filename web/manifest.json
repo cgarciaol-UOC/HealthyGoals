@@ -1,6 +1,6 @@
 {
-    "name": "healty_goals",
-    "short_name": "healty_goals",
+    "name": "healthy_goals",
+    "short_name": "healthy_goals",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

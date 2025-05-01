@@ -14,7 +14,7 @@ dependencies {
 
 
 android {
-    namespace = "com.example.healty_goals"
+    namespace = "com.example.healthy_goals"
     compileSdk = 35
 
 
@@ -29,7 +29,7 @@ android {
 
     defaultConfig {
         // TODO: Specify Application ID
-        applicationId = "com.example.healty_goals"
+        applicationId = "com.example.healthy_goals"
         minSdk = 23//TODO check this -> flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

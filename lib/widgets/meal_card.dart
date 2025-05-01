@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healty_goals/screens/meal_info.dart';
+import 'package:healthy_goals/screens/meal_info.dart';
 
 import '../screens/change_receipe.dart';
 
@@ -10,12 +10,12 @@ class MealCard extends StatelessWidget {
   final Color badgeColor;
 
   const MealCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.subtitle,
     required this.imageUrl,
     this.badgeColor = const Color(0x59000000),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

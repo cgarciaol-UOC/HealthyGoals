@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:healty_goals/screens/auth_screen.dart';
-import 'package:healty_goals/screens/change_receipe.dart';
-import 'package:healty_goals/screens/chat_screen.dart';
-import 'package:healty_goals/screens/meal_info.dart';
-import 'package:healty_goals/screens/meal_plan_screen.dart';
-import 'package:healty_goals/screens/workout_screen.dart';
-import 'package:healty_goals/widgets/settings_notifier.dart';
-import 'package:healty_goals/services/auth_service.dart';
+import 'package:healthy_goals/screens/auth_screen.dart';
+import 'package:healthy_goals/screens/change_receipe.dart';
+import 'package:healthy_goals/screens/chat_screen.dart';
+import 'package:healthy_goals/screens/meal_info.dart';
+import 'package:healthy_goals/screens/meal_plan_screen.dart';
+import 'package:healthy_goals/screens/workout_screen.dart';
+import 'package:healthy_goals/widgets/settings_notifier.dart';
+import 'package:healthy_goals/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'layouts/main_scaffold.dart';
 import 'screens/home_screen.dart';
@@ -67,7 +67,7 @@ final GoRouter _router = GoRouter(
 );
 
 class HealthyGoalsApp extends StatelessWidget {
-  const HealthyGoalsApp({Key? key}) : super(key: key);
+  const HealthyGoalsApp({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -5,7 +5,7 @@ import '../top_bar.dart';
 
 
   class MealScreen extends StatefulWidget {
-  const MealScreen({Key? key}) : super(key: key);
+  const MealScreen({super.key});
 
   @override
   _MealScreenState createState() => _MealScreenState();

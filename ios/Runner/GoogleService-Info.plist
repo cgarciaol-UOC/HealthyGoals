@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.healtyGoals</string>
+	<string>com.example.healthyGoals</string>
 	<key>PROJECT_ID</key>
 	<string>healthygoals-ab2ea</string>
 	<key>STORAGE_BUCKET</key>

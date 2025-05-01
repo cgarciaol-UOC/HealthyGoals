@@ -6,7 +6,7 @@ import '../bottom_navigation.dart';
 class MainScaffold extends StatelessWidget {
   final Widget child;
 
-  const MainScaffold({Key? key, required this.child}) : super(key: key);
+  const MainScaffold({super.key, required this.child});
 
   static const tabs = ['/home', '/mealplan', '/workout', '/chat'];
 

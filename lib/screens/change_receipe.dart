@@ -4,7 +4,7 @@ import '../top_bar.dart';
 import '../widgets/change_receipe_card.dart';
 
 class ChangeRecipeScreen extends StatefulWidget {
-  const ChangeRecipeScreen({Key? key}) : super(key: key);
+  const ChangeRecipeScreen({super.key});
 
   @override
   State<ChangeRecipeScreen> createState() => _ChangeRecipeScreenState();

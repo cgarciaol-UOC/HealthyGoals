@@ -1,4 +1,4 @@
-# healty_goals
+# healthy_goals
 
 A new Flutter project.
 

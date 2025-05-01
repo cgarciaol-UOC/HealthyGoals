@@ -6,7 +6,7 @@ import '../widgets/daily_meal_card.dart';
 import '../widgets/meal_card.dart';
 
 class MealPlanScreen extends StatefulWidget {
-  const MealPlanScreen({Key? key}) : super(key: key);
+  const MealPlanScreen({super.key});
 
   @override
   _MealPlanScreenState createState() => _MealPlanScreenState();

@@ -16,7 +16,7 @@ class Exercise {
 }
 
 class WorkoutScreen extends StatefulWidget {
-  const WorkoutScreen({Key? key}) : super(key: key);
+  const WorkoutScreen({super.key});
 
   @override
   _WorkoutScreenState createState() => _WorkoutScreenState();

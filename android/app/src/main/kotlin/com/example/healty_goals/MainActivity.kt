@@ -1,4 +1,4 @@
-package com.example.healty_goals
+package com.example.healthy_goals
 
 import io.flutter.embedding.android.FlutterActivity
 

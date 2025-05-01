@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healty_goals/screens/meal_info.dart';
+import 'package:healthy_goals/screens/meal_info.dart';
 
 import '../screens/change_receipe.dart';
 
@@ -7,8 +7,7 @@ class RecipeCard extends StatelessWidget {
   final String title;
   final String imageUrl;
 
-  const RecipeCard({Key? key, required this.title, required this.imageUrl})
-      : super(key: key);
+  const RecipeCard({super.key, required this.title, required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {

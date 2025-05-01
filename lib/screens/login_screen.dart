@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:healty_goals/services/auth_service.dart';
+import 'package:healthy_goals/services/auth_service.dart';
 
 class LogIn extends StatefulWidget {
   final VoidCallback onToggle;

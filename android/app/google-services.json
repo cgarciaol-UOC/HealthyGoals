@@ -1,21 +1,41 @@
 {
   "project_info": {
-    "project_number": "837161346472",
-    "project_id": "healthygoals-ab2ea",
-    "storage_bucket": "healthygoals-ab2ea.firebasestorage.app"
+    "project_number": "725028337249",
+    "firebase_url": "https://fluid-isotope-198118.firebaseio.com",
+    "project_id": "fluid-isotope-198118",
+    "storage_bucket": "fluid-isotope-198118.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:837161346472:android:2513621c6d52dc1adaa99d",
+        "mobilesdk_app_id": "1:725028337249:android:dc342ed4109e97193f1c20",
         "android_client_info": {
-          "package_name": "com.example.healty_goals"
+          "package_name": "com.example.healthy_goals"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCK_thSvNLr7IOgL9SGUmHbni6ZZDnwEtQ"
+          "current_key": "AIzaSyDNjtj4U3LHbJAz5jCWuwAXbVqRp5li6zo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725028337249:android:ef5eaabbf2e06cc73f1c20",
+        "android_client_info": {
+          "package_name": "com.example.healthy_goals"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNjtj4U3LHbJAz5jCWuwAXbVqRp5li6zo"
         }
       ],
       "services": {

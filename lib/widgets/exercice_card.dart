@@ -4,7 +4,7 @@ class ExerciseCard extends StatelessWidget {
   final String name;
   final String description;
 
-  const ExerciseCard({Key? key, required this.name, required this.description}) : super(key: key);
+  const ExerciseCard({super.key, required this.name, required this.description});
 
   @override
   Widget build(BuildContext context) {

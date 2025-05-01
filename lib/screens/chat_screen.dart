@@ -4,7 +4,7 @@ import '../top_bar.dart';
 import '../widgets/meal_card.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+  const ChatScreen({super.key});
 
   @override
   _ChatScreenState createState() => _ChatScreenState();

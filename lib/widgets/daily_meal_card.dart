@@ -6,13 +6,13 @@ class DailyMealCard extends StatelessWidget {
   final String day;
   final String description;
 
-  DailyMealCard({required this.day, required this.description});
+  const DailyMealCard({super.key, required this.day, required this.description});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
+        SizedBox(
           width: 336,
           height: 122,
           child: Stack(

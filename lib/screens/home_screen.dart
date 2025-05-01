@@ -8,7 +8,7 @@ class HomeScreen extends StatefulWidget {
   final String day; // Parámetro para el día
   final List<Meal> meals; // Lista de recetas
 
-  const HomeScreen({Key? key, required this.day, required this.meals}) : super(key: key);
+  const HomeScreen({super.key, required this.day, required this.meals});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
