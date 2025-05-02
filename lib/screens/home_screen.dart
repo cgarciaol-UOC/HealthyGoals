@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../top_bar.dart';
-import '../bottom_navigation.dart';
 import '../widgets/meal_card.dart';
 
 class HomeScreen extends StatefulWidget {

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import '../bottom_navigation.dart';
 import '../top_bar.dart';
-import '../widgets/meal_card.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthy_goals/screens/meal_info.dart';
 
-import '../screens/change_receipe.dart';
 
 class RecipeCard extends StatelessWidget {
   final String title;

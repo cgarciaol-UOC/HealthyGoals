@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../bottom_navigation.dart';
 import '../top_bar.dart';
 import '../widgets/daily_meal_card.dart';
-import '../widgets/meal_card.dart';
 
 class MealPlanScreen extends StatefulWidget {
   const MealPlanScreen({super.key});
