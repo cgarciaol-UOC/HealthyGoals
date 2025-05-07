@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:provider/provider.dart';
 import '../bottom_navigation.dart';
+import '../services/auth_service.dart';
 
 class MainScaffold extends StatelessWidget {
   final Widget child;
@@ -19,16 +20,50 @@ class MainScaffold extends StatelessWidget {
     final location = GoRouterState.of(context).uri.toString();
     final selectedIndex = _locationToIndex(location);
 
-    return Scaffold(
-      body: child,
-      bottomNavigationBar: selectedIndex != -1
-    ? BottomNavigation(
-    selectedIndex: selectedIndex,
-      onItemTapped: (index) {
-        context.go(tabs[index]);
+    final authService = Provider.of<AuthService>(context, listen: false);
+
+    // Si no está en /chat, render normal con bottom nav
+    if (location != '/chat') {
+      return Scaffold(
+        body: child,
+        bottomNavigationBar:
+            selectedIndex != -1
+                ? BottomNavigation(
+                  selectedIndex: selectedIndex,
+                  onItemTapped: (index) {
+                    context.go(tabs[index]);
+                  },
+                )
+                : null,
+      );
+    }
+
+    // Si está en /chat, comprobar inputText
+    return FutureBuilder<bool>(
+      future: authService.hasInputText(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          // Pantalla en blanco mientras carga
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final hasInputText = snapshot.data!;
+
+        return Scaffold(
+          body: child,
+          bottomNavigationBar:
+              hasInputText
+                  ? BottomNavigation(
+                    selectedIndex: selectedIndex,
+                    onItemTapped: (index) {
+                      context.go(tabs[index]);
+                    },
+                  )
+                  : null,
+        );
       },
-    )
-        : null,
     );
   }
 }

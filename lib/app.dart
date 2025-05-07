@@ -13,10 +13,32 @@ import 'layouts/main_scaffold.dart';
 import 'screens/home_screen.dart';
 import 'screens/settings_screen.dart';
 
+final String diaActual = obtenerDiaSemana(DateTime.now().weekday);
+String obtenerDiaSemana(int numeroDia) {
+  switch (numeroDia) {
+    case 1:
+      return 'lunes';
+    case 2:
+      return 'martes';
+    case 3:
+      return 'miercoles';
+    case 4:
+      return 'jueves';
+    case 5:
+      return 'viernes';
+    case 6:
+      return 'sabado';
+    case 7:
+      return 'domingo';
+    default:
+      return 'lunes';
+  }
+}
+
 final GoRouter _router = GoRouter(
   initialLocation: '/',
   refreshListenable: AuthServiceListener(),
-  redirect: (context, state) {
+  redirect: (context, state) async {
     final authService = Provider.of<AuthService>(context, listen: false);
     final isLoggedIn = authService.isLoggedIn;
 
@@ -25,7 +47,13 @@ final GoRouter _router = GoRouter(
     }
 
     if (isLoggedIn && state.matchedLocation == '/') {
-      return '/home';
+      final isGoalExisting =
+          await Provider.of<AuthService>(context, listen: false).hasInputText();
+      if (isGoalExisting) {
+        return '/home';
+      } else {
+        return '/chat';
+      }
     }
 
     return null;
@@ -37,8 +65,10 @@ final GoRouter _router = GoRouter(
       routes: [
         GoRoute(
           path: '/home',
-          builder:
-              (context, state) => const HomeScreen(day: 'Monday', meals: []),
+          builder: (context, state) {
+            final String diaActual = obtenerDiaSemana(DateTime.now().weekday);
+            return HomeScreen(day: diaActual);
+          },
         ),
         GoRoute(
           path: '/mealplan',
@@ -46,11 +76,19 @@ final GoRouter _router = GoRouter(
         ),
         GoRoute(
           path: '/changereceipe',
-          builder: (context, state) => const ChangeRecipeScreen(),
+          builder:
+              (context, state) => const ChangeRecipeScreen(
+                title: '',
+                subtitle: '',
+                imageUrl: '',
+                day: '',
+              ),
         ),
         GoRoute(
           path: '/receipe',
-          builder: (context, state) => const MealScreen(),
+          builder:
+              (context, state) =>
+                  const MealScreen(mealData: {}, day: '', title: ''),
         ),
         GoRoute(
           path: '/workout',

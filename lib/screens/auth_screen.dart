@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'login_screen.dart';
 import 'signup_screen.dart';
@@ -10,7 +12,7 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  bool showLogin = false;
+  bool showLogin = true;
 
   void toggleScreen() {
     setState(() {
@@ -21,9 +23,10 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: showLogin
-          ? LogIn(onToggle: toggleScreen)
-          : SignUp(onToggle: toggleScreen),
+      body:
+          showLogin
+              ? LogIn(onToggle: toggleScreen)
+              : SignUp(onToggle: toggleScreen),
     );
   }
 }

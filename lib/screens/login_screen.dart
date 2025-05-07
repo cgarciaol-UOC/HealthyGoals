@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:healthy_goals/services/auth_service.dart';
 
@@ -18,9 +19,17 @@ class _LogInState extends State<LogIn> {
 
   void _login() async {
     try {
-      await Provider.of<AuthService>(context, listen: false)
-          .loginWithEmail(emailController.text, passwordController.text);
-      // Aquí ya se notifica al GoRouter mediante notifyListeners()
+      await Provider.of<AuthService>(
+        context,
+        listen: false,
+      ).loginWithEmail(emailController.text, passwordController.text);
+      final isGoalExisting =
+          await Provider.of<AuthService>(context, listen: false).hasInputText();
+      if (isGoalExisting) {
+        GoRouter.of(context).go('/');
+      } else {
+        GoRouter.of(context).go('/chat');
+      }
     } catch (e) {
       setState(() {
         errorMessage = 'Error: ${e.toString()}';
@@ -50,10 +59,7 @@ class _LogInState extends State<LogIn> {
             const SizedBox(height: 10),
             const Text(
               'Fill your details or continue with social media',
-              style: TextStyle(
-                color: Color(0xFF6A6A6A),
-                fontSize: 16,
-              ),
+              style: TextStyle(color: Color(0xFF6A6A6A), fontSize: 16),
             ),
             const SizedBox(height: 40),
             _buildInputField('Email Address', emailController),
@@ -89,11 +95,17 @@ class _LogInState extends State<LogIn> {
                     children: [
                       TextSpan(
                         text: 'New User? ',
-                        style: TextStyle(color: Color(0xFF6A6A6A), fontSize: 16),
+                        style: TextStyle(
+                          color: Color(0xFF6A6A6A),
+                          fontSize: 16,
+                        ),
                       ),
                       TextSpan(
                         text: 'Create Account',
-                        style: TextStyle(color: Color(0xFF45484D), fontSize: 16),
+                        style: TextStyle(
+                          color: Color(0xFF45484D),
+                          fontSize: 16,
+                        ),
                       ),
                     ],
                   ),
@@ -114,8 +126,11 @@ class _LogInState extends State<LogIn> {
     );
   }
 
-  Widget _buildInputField(String hint, TextEditingController controller,
-      {bool obscure = false}) {
+  Widget _buildInputField(
+    String hint,
+    TextEditingController controller, {
+    bool obscure = false,
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -125,8 +140,10 @@ class _LogInState extends State<LogIn> {
         controller: controller,
         obscureText: obscure,
         decoration: InputDecoration(
-          contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 16,
+          ),
           hintText: hint,
           border: InputBorder.none,
         ),

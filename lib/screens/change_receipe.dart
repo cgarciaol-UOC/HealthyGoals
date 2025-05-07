@@ -1,24 +1,62 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import '../services/diet_service.dart';
 import '../top_bar.dart';
 import '../widgets/change_receipe_card.dart';
+import 'home_screen.dart';
 
 class ChangeRecipeScreen extends StatefulWidget {
-  const ChangeRecipeScreen({super.key});
+  final String title;
+  final String subtitle;
+  final String imageUrl;
+  final String day;
+
+  const ChangeRecipeScreen({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.imageUrl,
+    required this.day,
+  });
 
   @override
   State<ChangeRecipeScreen> createState() => _ChangeRecipeScreenState();
 }
 
 class _ChangeRecipeScreenState extends State<ChangeRecipeScreen> {
-  final List<Map<String, String>> recipes = List.generate(
-    6,
-        (index) => {
-      'title': 'lorem ipsum',
-      'image': 'https://placehold.co/293x441',
-    },
-  );
-
+  List<Map<String, dynamic>> recipes = [];
   int? selectedIndex; // Guarda el índice seleccionado
+  DietService dietService = DietService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRecipes();
+  }
+
+  Future<void> _loadRecipes() async {
+    final recipesData = await dietService.getRecipes();
+    print('Respuesta del backend: $recipesData');
+
+    if (recipesData != null && recipesData['meals'] is List) {
+      setState(() {
+        recipes = List<Map<String, dynamic>>.from(
+          recipesData['meals'].map(
+            (meal) => {
+              'id': meal['idMeal'] ?? 'Unknown',
+              'title': meal['strMeal'] ?? 'Unknown',
+              'image': meal['strMealThumb'] ?? 'https://placehold.co/293x441',
+              'meal': meal,
+            },
+          ),
+        );
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,12 +99,13 @@ class _ChangeRecipeScreenState extends State<ChangeRecipeScreen> {
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      border: isSelected
-                          ? Border.all(
-                        color: const Color(0xFFF27E33),
-                        width: 10,
-                      )
-                          : null,
+                      border:
+                          isSelected
+                              ? Border.all(
+                                color: const Color(0xFFF27E33),
+                                width: 10,
+                              )
+                              : null,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: RecipeCard(
@@ -96,8 +135,22 @@ class _ChangeRecipeScreenState extends State<ChangeRecipeScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.pop(context); // Vuelve atrás
+        onPressed: () async {
+          if (selectedIndex != null) {
+            final selectedRecipe = recipes[selectedIndex!];
+            print('Respuesta del backend: $selectedRecipe');
+            await _updateRecipeInFirebase(selectedRecipe);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeScreen(day: widget.day),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Please select a recipe first')),
+            );
+          }
         },
         backgroundColor: const Color(0xFFF27E33),
         label: const Text(
@@ -107,5 +160,18 @@ class _ChangeRecipeScreenState extends State<ChangeRecipeScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+  }
+
+  Future<void> _updateRecipeInFirebase(Map<String, dynamic> mealDetails) async {
+    final user = FirebaseAuth.instance.currentUser;
+    print('Respuesta del backend: ${widget.day}');
+    print('Respuesta del backend: ${widget.title}');
+    final String path = "semanal_planning.${widget.day}.${widget.title}";
+
+    if (user != null) {
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).update(
+        {path: mealDetails['meal']},
+      );
+    }
   }
 }

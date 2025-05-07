@@ -1,19 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import '../top_bar.dart';
+import 'change_receipe.dart';
 
+class MealScreen extends StatefulWidget {
+  final Map<String, dynamic> mealData;
+  final String day;
+  final String title;
 
-  class MealScreen extends StatefulWidget {
-  const MealScreen({super.key});
+  const MealScreen({
+    super.key,
+    required this.mealData,
+    required this.day,
+    required this.title,
+  });
 
   @override
   _MealScreenState createState() => _MealScreenState();
+}
+
+class _MealScreenState extends State<MealScreen> {
+  List<String> getIngredients(Map<String, dynamic> mealData) {
+    List<String> ingredients = [];
+    for (int i = 1; i <= 20; i++) {
+      final ingredient = mealData['strIngredient$i'];
+      final measure = mealData['strMeasure$i'];
+      if (ingredient != null && ingredient.isNotEmpty) {
+        ingredients.add('$ingredient - ${measure ?? ''}');
+      }
+    }
+    return ingredients;
   }
 
-  class _MealScreenState extends State<MealScreen> {
   @override
   Widget build(BuildContext context) {
+    final ingredients = getIngredients(widget.mealData);
+
     return Scaffold(
       backgroundColor: const Color(0xFFFBFBFB),
       appBar: const CommonAppBar(title: 'Healthy Goals', showBackButton: true),
@@ -28,7 +50,7 @@ import '../top_bar.dart';
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: Image.network(
-                    "https://placehold.co/174x236",
+                    widget.mealData['strMealThumb'],
                     height: 236,
                     width: 174,
                     fit: BoxFit.cover,
@@ -40,8 +62,8 @@ import '../top_bar.dart';
               /// Recipe Title
               Center(
                 child: Text(
-                  'Lorem ipsum',
-                  style: TextStyle(
+                  widget.mealData['strMeal'],
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Poppins',
@@ -51,7 +73,7 @@ import '../top_bar.dart';
               const SizedBox(height: 20),
 
               /// Ingredients
-              Text(
+              const Text(
                 'Ingredients',
                 style: TextStyle(
                   fontSize: 16,
@@ -60,18 +82,19 @@ import '../top_bar.dart';
                 ),
               ),
               const SizedBox(height: 10),
-              Text(
-                'Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum',
-                style: TextStyle(
-                  color: Color(0xFF9093A3),
-                  fontSize: 14,
-                  fontFamily: 'Poppins',
+              for (var ingredient in ingredients)
+                Text(
+                  ingredient,
+                  style: const TextStyle(
+                    color: Color(0xFF9093A3),
+                    fontSize: 14,
+                    fontFamily: 'Poppins',
+                  ),
                 ),
-              ),
               const SizedBox(height: 20),
 
               /// Prepare
-              Text(
+              const Text(
                 'Prepare',
                 style: TextStyle(
                   fontSize: 16,
@@ -81,8 +104,8 @@ import '../top_bar.dart';
               ),
               const SizedBox(height: 10),
               Text(
-                'Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum',
-                style: TextStyle(
+                widget.mealData['strInstructions'],
+                style: const TextStyle(
                   color: Color(0xFF9093A3),
                   fontSize: 14,
                   fontFamily: 'Poppins',
@@ -95,9 +118,21 @@ import '../top_bar.dart';
                 alignment: Alignment.centerRight,
                 child: GestureDetector(
                   onTap: () {
-                    context.push('/changereceipe'); // o context.go('/otraRuta');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => ChangeRecipeScreen(
+                              title: widget.title,
+                              subtitle: widget.mealData['strMeal'],
+                              imageUrl: widget.mealData['strMealThumb'],
+                              day: widget.day,
+                            ),
+                      ),
+                    );
+                    //context.push('/changereceipe');
                   },
-                  child: Text(
+                  child: const Text(
                     'Change this recipe',
                     style: TextStyle(
                       color: Color(0xFF9093A3),

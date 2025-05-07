@@ -1,0 +1,12 @@
+name: healthygoals
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - spacy=3.8.5
+  - blis
+  - numpy=1.26.4
+  - requests
+  - fastapi
+  - uvicorn
+  - python-dotenv

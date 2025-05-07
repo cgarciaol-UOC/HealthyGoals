@@ -6,7 +6,11 @@ class DailyMealCard extends StatelessWidget {
   final String day;
   final String description;
 
-  const DailyMealCard({super.key, required this.day, required this.description});
+  const DailyMealCard({
+    super.key,
+    required this.day,
+    required this.description,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +91,9 @@ class DailyMealCard extends StatelessWidget {
                     // Navegar a la pantalla de inicio
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => HomeScreen(day: 'Monday', meals: [],)),
+                      MaterialPageRoute(
+                        builder: (context) => HomeScreen(day: day),
+                      ),
                     );
                   },
                 ),
@@ -99,4 +105,3 @@ class DailyMealCard extends StatelessWidget {
     );
   }
 }
-
