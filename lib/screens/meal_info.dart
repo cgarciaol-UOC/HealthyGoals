@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:healthy_goals/custom_theme.dart';
 import '../top_bar.dart';
 import 'change_receipe.dart';
 
@@ -20,24 +21,25 @@ class MealScreen extends StatefulWidget {
 }
 
 class _MealScreenState extends State<MealScreen> {
-  List<String> getIngredients(Map<String, dynamic> mealData) {
-    List<String> ingredients = [];
-    for (int i = 1; i <= 20; i++) {
-      final ingredient = mealData['strIngredient$i'];
-      final measure = mealData['strMeasure$i'];
+  // Función optimizada para obtener los ingredientes
+  List<String?> getIngredients(Map<String, dynamic> mealData) {
+    return List.generate(20, (index) {
+      final ingredient = mealData['strIngredient${index + 1}'];
+      final measure = mealData['strMeasure${index + 1}'];
       if (ingredient != null && ingredient.isNotEmpty) {
-        ingredients.add('$ingredient - ${measure ?? ''}');
+        return '$ingredient - ${measure ?? ''}';
       }
-    }
-    return ingredients;
+      return null;
+    }).where((ingredient) => ingredient != null).toList();
   }
 
   @override
   Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
     final ingredients = getIngredients(widget.mealData);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBFB),
+      backgroundColor: customColors.backgroundColor,
       appBar: const CommonAppBar(title: 'Healthy Goals', showBackButton: true),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -45,7 +47,7 @@ class _MealScreenState extends State<MealScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// Recipe Image
+              // Imagen de la receta
               Center(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
@@ -59,83 +61,75 @@ class _MealScreenState extends State<MealScreen> {
               ),
               const SizedBox(height: 20),
 
-              /// Recipe Title
+              // Título de la receta
               Center(
                 child: Text(
                   widget.mealData['strMeal'],
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Poppins',
+                    color: customColors.textColor,
                   ),
                 ),
               ),
               const SizedBox(height: 20),
 
-              /// Ingredients
-              const Text(
+              // Ingredientes
+              Text(
                 'Ingredients',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   fontFamily: 'Poppins',
+                  color: customColors.textColor,
                 ),
               ),
               const SizedBox(height: 10),
               for (var ingredient in ingredients)
                 Text(
-                  ingredient,
-                  style: const TextStyle(
-                    color: Color(0xFF9093A3),
+                  ingredient!,
+                  style: TextStyle(
+                    color: customColors.iconColor,
                     fontSize: 14,
                     fontFamily: 'Poppins',
                   ),
                 ),
               const SizedBox(height: 20),
 
-              /// Prepare
-              const Text(
+              // Instrucciones
+              Text(
                 'Prepare',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   fontFamily: 'Poppins',
+                  color: customColors.textColor,
                 ),
               ),
               const SizedBox(height: 10),
               Text(
                 widget.mealData['strInstructions'],
-                style: const TextStyle(
-                  color: Color(0xFF9093A3),
+                style: TextStyle(
+                  color: customColors.iconColor,
                   fontSize: 14,
                   fontFamily: 'Poppins',
                 ),
               ),
               const SizedBox(height: 20),
 
-              /// Change recipe link
+              // Enlace para cambiar la receta
               Align(
                 alignment: Alignment.centerRight,
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (context) => ChangeRecipeScreen(
-                              title: widget.title,
-                              subtitle: widget.mealData['strMeal'],
-                              imageUrl: widget.mealData['strMealThumb'],
-                              day: widget.day,
-                            ),
-                      ),
-                    );
-                    //context.push('/changereceipe');
+                    // Usamos GoRouter para mantener la coherencia de navegación
+                    context.push('/changereceipe');
                   },
-                  child: const Text(
+                  child: Text(
                     'Change this recipe',
                     style: TextStyle(
-                      color: Color(0xFF9093A3),
+                      color: customColors.buttonColor,
                       fontSize: 14,
                       fontFamily: 'Poppins',
                     ),

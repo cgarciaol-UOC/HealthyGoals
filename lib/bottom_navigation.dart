@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:healthy_goals/custom_theme.dart';
 
 class BottomNavigation extends StatelessWidget {
   final int selectedIndex;
@@ -12,6 +13,8 @@ class BottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
+    final customColors = Theme.of(context).extension<CustomColors>()!;
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(20),
@@ -19,10 +22,10 @@ class BottomNavigation extends StatelessWidget {
       ),
       child: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
+        backgroundColor: customColors.backgroundColor,
         elevation: 10,
-        selectedItemColor: const Color(0xFFF27E33),
-        unselectedItemColor: const Color(0xFFA8A8AA),
+        selectedItemColor: customColors.buttonColor,
+        unselectedItemColor: customColors.iconColor,
         currentIndex: selectedIndex,
         onTap: onItemTapped,
         items: const <BottomNavigationBarItem>[

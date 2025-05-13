@@ -9,17 +9,16 @@ from dotenv import load_dotenv
 from deep_translator import GoogleTranslator
 from translate import Translator
 
-
-# Cargar variables de entorno desde el archivo .env
+#load environment variables from .env file
 load_dotenv()
 
-# Cargar modelo spaCy para español
+#load spacy model for spanish
 nlp = spacy.load("es_core_news_sm")
 
-# Inicializar FastAPI
+#initialize fastapi app
 app = FastAPI()
 
-# Configuración de CORS para aceptar peticiones desde cualquier frontend
+#set cors configuration to allow requests from any frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -28,7 +27,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Diccionario de palabras clave asociadas a tipos de dieta
+#spanish diet-related keywords mapped to internal identifiers
 diet_keywords_es = {
     'alta_proteina': ['proteina', 'alta en proteínas', 'mucha proteína', 'hiperproteica'],
     'ayuno_intermitente': ['ayuno intermitente', '16/8', 'ayuno', 'ayunar', '18/6', '12 horas sin comer'],
@@ -46,46 +45,46 @@ diet_keywords_es = {
     'vegana': ['vegana', 'vegano', 'sin productos animales', 'solo vegetal']
 }
 
+#mapping of internal diet identifiers to mealdb api categories
 diet_keywords = {
     'alta_proteina': ['Beef', 'Chicken', 'Seafood'],
-    'cetogenica': ['Beef', 'Pork', 'Lamb'], # Dietas altas en grasa animal
-    'mediterranea': ['Seafood', 'Vegetarian'], # Pescado y muchos vegetales
+    'cetogenica': ['Beef', 'Pork', 'Lamb'],
+    'mediterranea': ['Seafood', 'Vegetarian'],
     'vegetariana': ['Vegetarian'],
     'vegana': ['Vegan'],
-    'sin_gluten': ['Vegetarian', 'Pasta', 'Breakfast', 'Dessert', 'Side', 'Starter', 'Miscellaneous'], # Depende del plato
-    'sin_lacteos': ['Vegetarian', 'Beef', 'Chicken', 'Seafood', 'Pasta', 'Breakfast', 'Dessert', 'Side', 'Starter', 'Miscellaneous', 'Vegan'], # Depende del plato
+    'sin_gluten': ['Vegetarian', 'Pasta', 'Breakfast', 'Dessert', 'Side', 'Starter', 'Miscellaneous'],
+    'sin_lacteos': ['Vegetarian', 'Beef', 'Chicken', 'Seafood', 'Pasta', 'Breakfast', 'Dessert', 'Side', 'Starter', 'Miscellaneous', 'Vegan'],
     'ayuno_intermitente': ['Miscellaneous'],
-    'dash': ['Vegetarian', 'Seafood', 'Chicken'], # Bajo en sodio, enfocado en frutas, verduras, pescado, pollo sin piel
-    'flexitariana': ['Beef', 'Chicken', 'Seafood', 'Vegetarian'], # Amplia variedad
+    'dash': ['Vegetarian', 'Seafood', 'Chicken'],
+    'flexitariana': ['Beef', 'Chicken', 'Seafood', 'Vegetarian'],
     'low_carb': ['Beef', 'Chicken', 'Seafood', 'Pork', 'Lamb'],
-    'paleo': ['Beef', 'Chicken', 'Seafood', 'Lamb', 'Goat'], # Carnes magras, pescado, excluye granos y lácteos
+    'paleo': ['Beef', 'Chicken', 'Seafood', 'Lamb', 'Goat'],
     'raw_food': ['Vegan'],
-    'sin_azucar': ['Dessert', 'Breakfast', 'Miscellaneous'], # Postres, desayunos y otros sin azúcar
+    'sin_azucar': ['Dessert', 'Breakfast', 'Miscellaneous'],
 }
 
-# Palabras clave para objetivos fitness
+#keywords related to fitness goals
 objective_keywords = {
     'perder_peso': ['perder', 'adelgazar', 'bajar'],
     'ganar_musculo': ['músculo', 'fuerza', 'ganar músculo', 'entrenar fuerza', 'musculación'],
     'mantener_peso': ['mantener', 'mantener peso', 'mantenerme en forma', 'mantener mi peso']
 }
 
-# Modelo de entrada para la API
+#input model for the api
 class InputText(BaseModel):
-    texto: str
+    text: str
 
-# Función para analizar texto y detectar dieta + objetivo
-def analizar_texto(texto):
-    doc = nlp(texto.lower())
+#function to analyze user input and detect diet and fitness goal
+def analyze_text(text):
+    doc = nlp(text.lower())
     words_filtered = [token.text for token in doc if not token.is_stop]
     print(words_filtered)
-    # Buscar categorías de dieta directamente
+
     diet = None
     for key, keywords in diet_keywords_es.items():
         if any(keyword in words_filtered for keyword in keywords):
             diet = key
 
-    # Buscar objetivo (asumiendo que objective_keywords sigue la misma estructura anterior)
     objective = None
     for key, keywords in objective_keywords.items():
         if any(keyword in words_filtered for keyword in keywords):
@@ -95,69 +94,42 @@ def analizar_texto(texto):
     if not objective:
         objective = 'perder_peso'
 
-    return {'dieta': diet, 'objetivo': objective}
+    return {'diet': diet, 'objetive': objective}
 
-# Función para buscar recetas desde TheMealDB API
-def buscar_recetas(dieta_detectada):
-    if dieta_detectada is None:
-        return {"error": "No se detectó ninguna dieta"}
-    recetas = {"meals": []}
-    categorias_buscadas = set() # Para evitar buscar la misma categoría múltiples veces
+#function to fetch recipes from themealdb based on diet categories
+def search_recipes(diet_detected):
+    if diet_detected is None:
+        return {"error": "no se detectó ninguna dieta"}
+
+    meals = {"meals": []}
+    searched_categories = set()
     translator = GoogleTranslator(source='en', target='es')
 
-    for categoria in dieta_detectada:
-        categoria_lower = categoria.lower() # Asegurarse de que la búsqueda sea insensible a mayúsculas
-        if categoria_lower not in categorias_buscadas:
-            categorias_buscadas.add(categoria_lower)
-            url = f"https://www.themealdb.com/api/json/v1/1/filter.php?c={categoria_lower}"
+    for category in diet_detected:
+        lower_category = category.lower()
+        if lower_category not in searched_categories:
+            searched_categories.add(lower_category)
+            url = f"https://www.themealdb.com/api/json/v1/1/filter.php?c={lower_category}"
             response = requests.get(url)
 
             if response.status_code == 200 and response.json().get('meals'):
-               data = response.json()
-               for receta_basica in data['meals']:
-                   url = f"https://www.themealdb.com/api/json/v1/1/lookup.php?i={receta_basica['idMeal']}"
-                   item_response = requests.get(url)
-                   if item_response.status_code == 200:
-                       item_data = item_response.json()
-                       if 'meals' in item_data and item_data['meals']:
-                           meal_data = item_data['meals'][0]
-                           print("MEALM DATA")
-                           recetas["meals"].append(meal_data) #sin traducir
-
-                       """translated_item = {}
-
-                       for key, value in meal_data.items():
-                       # No traducimos URLs ni IDs, lo demás sí
-                           #if isinstance(value, str) and not value.startswith("http") and not key.startswith("id"):
-                           translated_item[key] = translate_text(value)
-                           #else:
-                              # translated_item[key] = value
-
-                       ingredients = []
-                       for i in range(1, 21):
-                           ingredient = meal_data.get(f'strIngredient{i}')
-                           measure = meal_data.get(f'strMeasure{i}')
-                           if ingredient and ingredient.strip():
-                               ingredients.append({
-                                   "ingredient": translate_text(ingredient),
-                                   "measure": translate_text(measure) if measure else ''
-                               })
-
-                       translated_item['ingredients'] = ingredients
-                       recetas["meals"].append(translated_item)"""
+                data = response.json()
+                for basic_recipe in data['meals']:
+                    url = f"https://www.themealdb.com/api/json/v1/1/lookup.php?i={basic_recipe['idMeal']}"
+                    item_response = requests.get(url)
+                    if item_response.status_code == 200:
+                        item_data = item_response.json()
+                        if 'meals' in item_data and item_data['meals']:
+                            meal_data = item_data['meals'][0]
+                            meals["meals"].append(meal_data)
 
         else:
             print("error with url")
             print(url)
-            #conda activate healthygoals_v2
-            #python -m uvicorn main:app --reload --host 0.0.0.0
 
-    return recetas
-    if response.status_code == 200:
-        return recetas
-    else:
-        return {"error": "No se pudieron obtener recetas", "status": response.status_code}
+    return meals
 
+#function to translate text using translate module
 def translate_text(text, target_lang="es"):
     if not text:
         return ""
@@ -165,74 +137,77 @@ def translate_text(text, target_lang="es"):
     translation = translator.translate(text)
     return translation
 
-def generar_plan_semanal(recetas):
-    dias_semana = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"]
-    comidas = ["desayuno", "comida", "merienda", "cena"]
-    plan_semanal = {}
+#function to generate a weekly plan from recipe data
+def generarate_weekly_plan(recipes):
+    week_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    meals = ["breakfast", "lunch", "snack", "dinner"]
+    weekly_plan = {}
 
-    if not recetas:
-        return {"mensaje": "No se encontraron recetas para esta dieta"}
+    if not recipes:
+        return {"mensaje": "no se encontraron recetas para esta dieta"}
 
-    for dia in dias_semana:
-        plan_semanal[dia] = {}
-        recetas_del_dia = random.sample(recetas["meals"], min(len(recetas["meals"]), len(comidas)))
-        for i, comida in enumerate(comidas):
-            # Si hay menos recetas que comidas, repetirá cuando toque (aunque puedes manejarlo)
-            if i < len(recetas_del_dia):
-                receta_seleccionada = recetas_del_dia[i]
+    for day in week_days:
+        weekly_plan[day] = {}
+        recipes_of_the_day = random.sample(recipes["meals"], min(len(recipes["meals"]), len(meals)))
+        for i, meal in enumerate(meals):
+            if i < len(recipes_of_the_day):
+                selected_recipe = recipes_of_the_day[i]
             else:
-                receta_seleccionada = random.choice(recetas["meals"])
+                selected_recipe = random.choice(recipes["meals"])
 
-            plan_semanal[dia][comida] = receta_seleccionada
-    return plan_semanal
+            weekly_plan[day][meal] = selected_recipe
+    return weekly_plan
 
+#function to fetch a single recipe from a given url
 def getRecipe(url):
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
         return data
+
+#fastapi head endpoint to test if service is alive
 @app.head("/")
 async def detection():
     return True
-# Endpoint para recibir texto, analizarlo y sugerir recetas
+
+#post endpoint to analyze input text and return analysis, recipes, and weekly plan
 @app.post("/analizar-texto/")
-async def analizar_texto_endpoint(input: InputText):
+async def analyze_text_endpoint(input: InputText):
     print("llega")
     print(input)
-    resultado = analizar_texto(input.texto)
-    print(resultado)
-    if not resultado['dieta']:
-        raise HTTPException(status_code=400, detail="No se detectó ninguna dieta en el texto proporcionado.")
+    result = analyze_text(input.text)
+    print(result)
 
-    if not resultado['objetivo']:
-        raise HTTPException(status_code=400, detail="No se detectó ningún objetivo fitness en el texto proporcionado.")
+    if not result['diet']:
+        raise HTTPException(status_code=400, detail="no se detectó ninguna dieta en el texto proporcionado.")
+
+    if not result['objetive']:
+        raise HTTPException(status_code=400, detail="no se detectó ningún objetivo fitness en el texto proporcionado.")
 
     categories_to_search = []
-    for dieta in resultado['dieta']:
-        categories_to_search.extend(diet_keywords.get(dieta, []))
+    for diet in result['diet']:
+        categories_to_search.extend(diet_keywords.get(diet, []))
     categories_to_search = list(set(categories_to_search))
 
     diet_categories = []
     for key, keywords in diet_keywords.items():
-        if key == resultado['dieta']:
+        if key == result['diet']:
             print(key)
             print(keywords)
             diet_categories = keywords
 
-
     print(categories_to_search)
-    # Buscar recetas si se detectó alguna dieta
-    recetas = buscar_recetas(diet_categories) if diet_categories else {"mensaje": "No se detectó dieta"}
-    if not recetas or not recetas.get('meals'):
-        raise HTTPException(status_code=404, detail="No se encontraron recetas para la dieta detectada.")
 
-    # Generar plan semanal si se detectó alguna dieta
-    plan_semanal = generar_plan_semanal(recetas) if recetas else {"mensaje": "No se detectó dieta"}
-    if not plan_semanal or "mensaje" in plan_semanal:
-        raise HTTPException(status_code=404, detail="No se pudo generar un plan semanal con las recetas disponibles.")
+    recipes = search_recipes(diet_categories) if diet_categories else {"mensaje": "no se detectó dieta"}
+    if not recipes or not recipes.get('meals'):
+        raise HTTPException(status_code=404, detail="no se encontraron recetas para la dieta detectada.")
+
+    weekly_plan = generarate_weekly_plan(recipes) if recipes else {"mensaje": "no se detectó dieta"}
+    if not weekly_plan or "mensaje" in weekly_plan:
+        raise HTTPException(status_code=404, detail="no se pudo generar un plan semanal con las recetas disponibles.")
 
     return {
-        "analisis": resultado,
-        "recipes": recetas,
-        "semanal_planning": plan_semanal
+        "analysis": result,
+        "recipes": recipes,
+        "semanal_planning": weekly_plan
     }

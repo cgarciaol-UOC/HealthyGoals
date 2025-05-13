@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:healthy_goals/custom_theme.dart';
 import 'package:healthy_goals/services/diet_service.dart';
 import '../models/meal_model.dart';
 import '../top_bar.dart';
@@ -16,14 +17,15 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
   int _selectedIndex = 0;
   Map<String, dynamic>? weeklyPlan;
   DietService dietService = DietService();
+
   final List<String> dayOrder = [
-    'lunes',
-    'martes',
-    'miercoles',
-    'jueves',
-    'viernes',
-    'sabado',
-    'domingo',
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
   ];
 
   void _onItemTapped(int index) {
@@ -39,13 +41,20 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
   }
 
   Future<void> _loadWeeklyPlan() async {
-    final plan = await dietService.getWeeklyPlan();
-    print('Respuesta del backend: $plan');
+    try {
+      final plan = await dietService.getWeeklyPlan();
+      print('Respuesta del backend: $plan');
 
-    if (plan != null) {
-      setState(() {
-        weeklyPlan = plan;
-      });
+      if (plan != null) {
+        setState(() {
+          weeklyPlan = plan;
+        });
+      }
+    } catch (e) {
+      // Manejo de errores en caso de que la carga falle
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al cargar el plan semanal')),
+      );
     }
   }
 
@@ -73,12 +82,6 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
       if (meals is Map<String, dynamic>) {
         meals.forEach((mealType, mealData) {
           if (mealData is Map<String, dynamic>) {
-            print("APA");
-            print(mealData);
-            //final mealList = mealData['meals'];
-            //if (mealList is List) {
-            //for (final meal in mealList) {
-            //if (meal is Map<String, dynamic>) {
             final mealObj = Meal.fromJson(mealData, mealType);
 
             mealObj.ingredients.forEach((ingredient, measure) {
@@ -92,26 +95,23 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
               }
             });
           }
-          //}
-          //}
-          //}
         });
       }
     });
 
-    print('🛒 Lista de la compra generada: $shopList');
-
-    //shopList = shopList.toSet().toList(); // Eliminar duplicados
+    print('Lista de la compra generada: $shopList');
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final customColors = Theme.of(context).extension<CustomColors>()!;
         return AlertDialog(
+          backgroundColor: customColors.backgroundColor,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                icon: const Icon(Icons.copy, color: Colors.grey),
+                icon: Icon(Icons.copy, color: customColors.buttonColor),
                 onPressed: () {
                   Clipboard.setData(
                     ClipboardData(
@@ -127,7 +127,7 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.close, color: Colors.grey),
+                icon: Icon(Icons.close, color: customColors.buttonColor),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -137,7 +137,7 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
           content: SingleChildScrollView(
             child: Text(
               shopList.entries.map((e) => '${e.value} ${e.key}').join('\n'),
-              style: const TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 16, color: customColors.textColor),
             ),
           ),
         );
@@ -147,68 +147,82 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const CommonAppBar(title: 'Healthy Goals', showBackButton: false),
-      body: Container(
-        color: const Color(0xFFFBFBFB),
-        child: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    showShopListPopover();
-                  },
-                  child: const Text(
-                    'See shop list',
-                    style: TextStyle(
-                      fontSize: 16,
-                      //color: Colors.blueAccent,
-                      //decoration: TextDecoration.underline,
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+    if (weeklyPlan == null) {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(
+              customColors.buttonColor,
+            ), // Usando el color del tema
+          ),
+        ), // Indicador de carga
+        bottomNavigationBar: null,
+      );
+    } else {
+      return Scaffold(
+        appBar: const CommonAppBar(
+          title: 'Healthy Goals',
+          showBackButton: false,
+        ),
+        body: Container(
+          color: customColors.backgroundColor,
+          child: ListView(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      showShopListPopover();
+                    },
+                    child: Text(
+                      'See shop list',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: customColors.textColor,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            if (weeklyPlan != null)
+                ],
+              ),
+              const SizedBox(height: 20),
+
               ...dayOrder.where((day) => weeklyPlan!.containsKey(day)).map((
                 day,
               ) {
                 final meals = weeklyPlan![day];
 
                 String description = '';
-
-                // Recorrer las comidas que quieres mostrar
                 for (var mealType in [
-                  'desayuno',
-                  'comida',
-                  'merienda',
-                  'cena',
+                  'breakfast',
+                  'lunch',
+                  'snack',
+                  'dinner',
                 ]) {
                   if (meals.containsKey(mealType)) {
                     final mealData = meals[mealType];
                     if (mealData is Map<String, dynamic>) {
-                      if (mealData.isNotEmpty) {
-                        final mealName = mealData['strMeal'] ?? 'Sin nombre';
-                        description += '$mealType: $mealName\n';
-                      } else {
-                        description += '$mealType: (sin plato)\n';
-                      }
+                      final mealName = mealData['strMeal'] ?? 'No name';
+                      description += '$mealType: $mealName\n';
                     }
                   } else {
                     description += '$mealType: (no disponible)\n';
                   }
                 }
-                return DailyMealCard(day: day, description: description.trim());
-              }).toList()
-            else
-              const CircularProgressIndicator(),
-          ],
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: DailyMealCard(
+                    day: day,
+                    description: description.trim(),
+                  ),
+                );
+              }).toList(),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 }

@@ -1,23 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 
-class SignUp extends StatelessWidget {
+class SignUp extends StatefulWidget {
   final VoidCallback onToggle;
 
-  SignUp({super.key, required this.onToggle});
+  const SignUp({super.key, required this.onToggle});
 
+  @override
+  _SignUpState createState() => _SignUpState();
+}
+
+class _SignUpState extends State<SignUp> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   String errorMessage = '';
+  bool isLoading = false;
 
   Future<void> _signUp(BuildContext context) async {
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       final email = emailController.text;
       final password = passwordController.text;
 
       if (email.isEmpty || password.isEmpty) {
+        setState(() {
+          errorMessage = 'Todos los campos son obligatorios';
+        });
+        return;
+      }
+
+      if (!RegExp(
+        r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+      ).hasMatch(email)) {
+        setState(() {
+          errorMessage = 'Por favor ingrese un correo electrónico válido.';
+        });
+        return;
+      }
+
+      if (password.length < 6) {
+        setState(() {
+          errorMessage = 'La contraseña debe tener al menos 6 caracteres.';
+        });
         return;
       }
 
@@ -28,12 +58,18 @@ class SignUp extends StatelessWidget {
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Usuario creado con éxito')));
-    } on FirebaseAuthException catch (e) {
-      errorMessage = e.message ?? 'Hubo un error al crear el usuario';
-      ScaffoldMessenger.of(
+      ).showSnackBar(const SnackBar(content: Text('Usuario creado con éxito')));
+      GoRouter.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(errorMessage)));
+      ).go('/home'); // Redirigir al usuario después del registro
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message ?? 'Hubo un error al crear el usuario';
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -68,29 +104,32 @@ class SignUp extends StatelessWidget {
             const SizedBox(height: 20),
             _buildInputField('Password', passwordController, obscure: true),
             const SizedBox(height: 40),
-            SizedBox(
-              width: double.infinity,
-              height: 54,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF27E33),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+            if (isLoading)
+              const Center(child: CircularProgressIndicator())
+            else
+              SizedBox(
+                width: double.infinity,
+                height: 54,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFF27E33),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () {
+                    _signUp(context);
+                  },
+                  child: const Text(
+                    'SIGN UP',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
-                onPressed: () {
-                  _signUp(context);
-                },
-                child: const Text(
-                  'SIGN UP',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
               ),
-            ),
             const SizedBox(height: 20),
             Center(
               child: TextButton(
-                onPressed: onToggle,
+                onPressed: widget.onToggle,
                 child: const Text.rich(
                   TextSpan(
                     children: [

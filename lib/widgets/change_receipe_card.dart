@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:healthy_goals/custom_theme.dart';
 
 
 class RecipeCard extends StatelessWidget {
@@ -9,6 +10,7 @@ class RecipeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
     return Column(
       children: [
         Expanded(
@@ -24,10 +26,11 @@ class RecipeCard extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             fontFamily: 'Poppins',
+            color: customColors.backgroundColorSame
           ),
         ),
       ],

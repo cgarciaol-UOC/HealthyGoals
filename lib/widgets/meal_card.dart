@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:healthy_goals/screens/meal_info.dart';
 
+import '../custom_theme.dart';
 import '../models/meal_model.dart';
 import '../screens/change_receipe.dart';
 
@@ -24,11 +25,7 @@ class MealCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('Respuesta del miau: $title');
-    print('Respuesta del miau: $subtitle');
-    print('Respuesta del miau: $imageUrl');
-    print('Respuesta del miau: $meal');
-
+    final customColors = Theme.of(context).extension<CustomColors>()!;
     return GestureDetector(
       onTap: () {
         // Navegar a la página Meal al hacer clic en la tarjeta
@@ -41,16 +38,24 @@ class MealCard extends StatelessWidget {
         );
       },
       child: Container(
-        constraints: BoxConstraints(maxWidth: 336, maxHeight: 110),
+        width:
+            MediaQuery.of(context).size.width *
+            0.85, // 80% del ancho de pantalla
+        constraints: BoxConstraints(maxHeight: 110),
         child: Stack(
           children: [
             // Fondo blanco con sombra
             Positioned.fill(
               child: Container(
                 decoration: ShapeDecoration(
-                  color: Colors.white,
+                  color: customColors.backgroundColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(
+                      // Aquí defines el borde
+                      color: customColors.iconColor.withOpacity(0.5),
+                      width: 2.0,
+                    ),
                   ),
                   shadows: [
                     BoxShadow(
@@ -68,7 +73,7 @@ class MealCard extends StatelessWidget {
               top: 10,
               right: 10,
               child: IconButton(
-                icon: Icon(Icons.edit, color: Colors.grey),
+                icon: Icon(Icons.edit, color: customColors.buttonColor),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -86,21 +91,21 @@ class MealCard extends StatelessWidget {
               ),
             ),
             // Badge con color personalizado
-            Positioned(
+            /*Positioned(
               left: 9,
               top: 11,
               child: Container(
                 width: 70,
                 height: 50,
                 decoration: ShapeDecoration(
-                  color: badgeColor,
+                  color: customColors.buttonColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ),
               ),
-            ),
-            // Título dentro del badge
+            ),*/
+            // Título dentro del badge (primera letra mayúscula)
             Positioned(
               left: 12,
               top: 28,
@@ -108,9 +113,9 @@ class MealCard extends StatelessWidget {
                 width: 70,
                 height: 30,
                 child: Text(
-                  title,
-                  style: const TextStyle(
-                    color: Color(0xFF45484D),
+                  title[0].toUpperCase() + title.substring(1),
+                  style: TextStyle(
+                    color: customColors.textColor,
                     fontSize: 14,
                     fontFamily: 'Montserrat',
                     fontWeight: FontWeight.w600,
@@ -119,12 +124,14 @@ class MealCard extends StatelessWidget {
                 ),
               ),
             ),
-            // Contenedor de la imagen
+            // Contenedor de la imagen (centrada)
             Positioned(
-              left: 112,
               top: 10,
+              left:
+                  (MediaQuery.of(context).size.width * 0.8 - 100) /
+                  2, // Centrado horizontal
               child: Container(
-                width: 140,
+                width: 120,
                 height: 70,
                 decoration: BoxDecoration(
                   image: DecorationImage(
@@ -134,20 +141,23 @@ class MealCard extends StatelessWidget {
                 ),
               ),
             ),
-            // Subtítulo debajo de la imagen
+            // Subtítulo debajo de la imagen (centrado)
             Positioned(
-              left: 113,
+              left:
+                  (MediaQuery.of(context).size.width * 0.8 - 80) /
+                  2, // Centrado horizontal
               top: 80,
               child: SizedBox(
                 width: 148,
                 height: 25,
                 child: Text(
                   subtitle,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 15,
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    color: customColors.textColor,
+                    fontSize: 14,
                     fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ),

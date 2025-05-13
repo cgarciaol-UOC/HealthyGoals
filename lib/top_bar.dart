@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:healthy_goals/custom_theme.dart';
 
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -15,30 +16,29 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: customColors.backgroundColor,
       elevation: 0,
       automaticallyImplyLeading: false,
-      leading: showBackButton
-          ? IconButton(
-        icon: const Icon(Icons.arrow_back, color: Color(0xFF45484D)),
-        onPressed: () {
-          context.pop();
-        },
-      )
-          : null,
+      leading:
+          showBackButton
+              ? IconButton(
+                icon: Icon(Icons.arrow_back, color: customColors.iconColor),
+                onPressed: () {
+                  context.pop();
+                },
+              )
+              : null,
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset(
-            'assets/images/logo.png', // Asegúrate de que esté en pubspec.yaml
-            height: 30,
-          ),
+          Image.asset('assets/images/logo.png', height: 30),
           const SizedBox(width: 8),
           Text(
             title,
-            style: const TextStyle(
-              color: Color(0xFF45484D),
+            style: TextStyle(
+              color: customColors.widgetColor,
               fontSize: 20,
               fontWeight: FontWeight.w500,
               fontFamily: 'Poppins',
@@ -50,7 +50,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         if (showSettings)
           IconButton(
-            icon: const Icon(Icons.settings, color: Color(0xFF45484D)),
+            icon: Icon(Icons.settings, color: customColors.widgetColor),
             onPressed: () {
               context.push('/settings');
             },

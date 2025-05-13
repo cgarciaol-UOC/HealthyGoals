@@ -10,13 +10,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+  final authService = AuthService();
+
+  final settingsNotifier = SettingsNotifier(authService);
+  await settingsNotifier.loadSettings();
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => SettingsNotifier()),
-        ChangeNotifierProvider(
-          create: (_) => AuthService(),
-        ), // lo añadimos aquí
+        ChangeNotifierProvider(create: (_) => authService),
+        ChangeNotifierProvider(create: (_) => settingsNotifier),
       ],
       child: const HealthyGoalsApp(),
     ),

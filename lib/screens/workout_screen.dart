@@ -1,17 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:healthy_goals/custom_theme.dart';
 import '../top_bar.dart';
 import '../widgets/exercice_card.dart';
 
 class Exercise {
   final String name;
   final String description;
+  final String imageUrl;
 
-  Exercise({required this.name, required this.description});
+  Exercise({
+    required this.name,
+    required this.description,
+    required this.imageUrl,
+  });
 
   factory Exercise.fromJson(Map<String, dynamic> json) {
-    return Exercise(name: json['name'], description: json['description']);
+    final instructions = (json['instructions'] as List<dynamic>?)
+            ?.join('\n') ??
+        'No instructions available';
+
+    final List<dynamic>? images = json['images'];
+    String imageUrl = '';
+    if (images != null && images.isNotEmpty) {
+      imageUrl =
+          'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/${images[0]}';
+    }
+
+    return Exercise(
+      name: json['name'] ?? 'Unnamed Exercise',
+      description: instructions,
+      imageUrl: imageUrl,
+    );
   }
 }
 
@@ -23,78 +44,101 @@ class WorkoutScreen extends StatefulWidget {
 }
 
 class _WorkoutScreenState extends State<WorkoutScreen> {
-  int _selectedIndex = 0;
   List<Exercise> exercises = [];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchExercises();
+    fetchExercisesFromFirestore();
   }
 
-  Future<void> fetchExercises() async {
+  Future<void> fetchExercisesFromFirestore() async {
     try {
-      final response = await http.get(
-        Uri.parse('https://tu-api.com/exercises'),
-      );
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception("No user logged in");
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
 
-        if (data.isNotEmpty) {
-          setState(() {
-            exercises = data.map((json) => Exercise.fromJson(json)).toList();
-          });
-        } else {
-          _loadFallbackExercises();
-        }
-      } else {
-        _loadFallbackExercises();
+      final data = doc.data();
+      if (data == null || data['exercises'] == null) {
+        throw Exception("No exercises found for this user");
       }
+
+      final List<dynamic> exercisesJson = data['exercises'];
+
+      setState(() {
+        exercises = exercisesJson
+            .map((json) => Exercise.fromJson(Map<String, dynamic>.from(json)))
+            .toList();
+            print(exercises);
+        _isLoading = false;
+      });
     } catch (e) {
-      debugPrint('Error al cargar ejercicios: $e');
+      debugPrint('Error al cargar ejercicios desde Firestore: $e');
       _loadFallbackExercises();
     }
   }
 
   void _loadFallbackExercises() {
-    final ex = [
-      {"name": "Push Ups", "description": "3 sets of 15 reps"},
-      {"name": "Squats", "description": "3 sets of 20 reps"},
+    final fallback = [
+      {
+        "name": "Push Ups",
+        "instructions": ["3 sets of 15 reps"],
+        "images": []
+      },
+      {
+        "name": "Squats",
+        "instructions": ["3 sets of 20 reps"],
+        "images": []
+      }
     ];
 
     setState(() {
-      exercises = ex.map((json) => Exercise.fromJson(json)).toList();
+      exercises = fallback.map((json) => Exercise.fromJson(json)).toList();
+      _isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
     return Scaffold(
-      appBar: const CommonAppBar(title: 'Exercise List', showBackButton: true),
+      appBar: const CommonAppBar(title: 'Healthy Goals'),
       body: Container(
-        color: const Color(0xFFFBFBFB),
+        color: customColors.backgroundColor,
         padding: const EdgeInsets.all(16),
-        child:
-            exercises.isEmpty
-                ? const Center(child: CircularProgressIndicator())
-                : ListView(
-                  children:
-                      exercises
-                          .map(
-                            (exercise) => ExerciseCard(
-                              name: exercise.name,
-                              description: exercise.description,
-                            ),
-                          )
-                          .toList(),
+        child: _isLoading
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          customColors.buttonColor),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Cargando ejercicios...',
+                      style: TextStyle(color: customColors.textColor),
+                    ),
+                  ],
                 ),
+              )
+            : ListView(
+                children: exercises
+                    .map(
+                      (exercise) => ExerciseCard(
+                        name: exercise.name,
+                        description: exercise.description,
+                        imageUrl: exercise.imageUrl,
+                      ),
+                    )
+                    .toList(),
+              ),
       ),
     );
   }

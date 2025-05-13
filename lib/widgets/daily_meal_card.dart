@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:healthy_goals/custom_theme.dart';
 import '../screens/home_screen.dart';
 
 class DailyMealCard extends StatelessWidget {
@@ -14,24 +14,26 @@ class DailyMealCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          width: 336,
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+    return Center(
+      child: FractionallySizedBox(
+        widthFactor: 0.95, // Ocupa el 80% del ancho de la pantalla
+        child: SizedBox(
           height: 122,
           child: Stack(
             children: [
-              // Fondo blanco con sombra
-              Positioned(
-                left: 0,
-                top: 0,
+              // Fondo con sombra
+              Positioned.fill(
                 child: Container(
-                  width: 336,
-                  height: 122,
                   decoration: ShapeDecoration(
-                    color: Colors.white,
+                    color: customColors.backgroundColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(
+                        // Aquí defines el borde
+                        color: customColors.iconColor.withOpacity(0.5),
+                        width: 2.0,
+                      ),
                     ),
                     shadows: [
                       BoxShadow(
@@ -44,22 +46,17 @@ class DailyMealCard extends StatelessWidget {
                   ),
                 ),
               ),
-              // Día de la semana
+              // Día
               Positioned(
                 left: 19,
                 top: 27,
-                child: SizedBox(
-                  width: 84.75,
-                  height: 12.33,
-                  child: Text(
-                    day, // Día dinámico
-                    style: TextStyle(
-                      color: const Color(0xFF45484D),
-                      fontSize: 16,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w600,
-                      height: 1,
-                    ),
+                child: Text(
+                  day[0].toUpperCase() + day.substring(1),
+                  style: TextStyle(
+                    color: customColors.textColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    height: 1,
                   ),
                 ),
               ),
@@ -67,17 +64,13 @@ class DailyMealCard extends StatelessWidget {
               Positioned(
                 left: 104,
                 top: 5,
-                child: SizedBox(
-                  width: 223,
-                  height: 101,
-                  child: Text(
-                    description, // Descripción dinámica
-                    style: TextStyle(
-                      color: const Color(0xFF9093A3),
-                      fontSize: 14,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w400,
-                    ),
+                right: 50, // Deja espacio para el botón
+                child: Text(
+                  description,
+                  style: TextStyle(
+                    color: customColors.textColor,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ),
@@ -86,9 +79,8 @@ class DailyMealCard extends StatelessWidget {
                 top: 10,
                 right: 10,
                 child: IconButton(
-                  icon: Icon(Icons.edit, color: Colors.grey),
+                  icon: Icon(Icons.edit, color: customColors.buttonColor),
                   onPressed: () {
-                    // Navegar a la pantalla de inicio
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -101,7 +93,7 @@ class DailyMealCard extends StatelessWidget {
             ],
           ),
         ),
-      ],
+      ),
     );
   }
 }
