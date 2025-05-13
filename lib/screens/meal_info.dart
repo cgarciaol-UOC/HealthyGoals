@@ -21,7 +21,7 @@ class MealScreen extends StatefulWidget {
 }
 
 class _MealScreenState extends State<MealScreen> {
-  // Función optimizada para obtener los ingredientes
+  // funcion para obtener los ingredientes de la receta
   List<String?> getIngredients(Map<String, dynamic> mealData) {
     return List.generate(20, (index) {
       final ingredient = mealData['strIngredient${index + 1}'];
@@ -74,8 +74,6 @@ class _MealScreenState extends State<MealScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Ingredientes
               Text(
                 'Ingredients',
                 style: TextStyle(
@@ -96,8 +94,6 @@ class _MealScreenState extends State<MealScreen> {
                   ),
                 ),
               const SizedBox(height: 20),
-
-              // Instrucciones
               Text(
                 'Prepare',
                 style: TextStyle(
@@ -118,12 +114,11 @@ class _MealScreenState extends State<MealScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Enlace para cambiar la receta
+              // enlace para cambiar la receta
               Align(
                 alignment: Alignment.centerRight,
                 child: GestureDetector(
                   onTap: () {
-                    // Usamos GoRouter para mantener la coherencia de navegación
                     context.push('/changereceipe');
                   },
                   child: Text(

@@ -14,9 +14,10 @@ import 'layouts/main_scaffold.dart';
 import 'screens/home_screen.dart';
 import 'screens/settings_screen.dart';
 
-//función para obtener el día de la semana como string
+// función para obtener el día de la semana como string
 final String currentDay = getWeekDay(DateTime.now().weekday);
 
+// funcion para convertir el número del día en el nombre del día
 String getWeekDay(int numberDay) {
   switch (numberDay) {
     case 1:
@@ -38,39 +39,31 @@ String getWeekDay(int numberDay) {
   }
 }
 
-//configuración de gorouter para la navegación
+// configuración de gorouter para la navegación
 final GoRouter _router = GoRouter(
-  initialLocation: '/', //ruta inicial de la aplicación
-  refreshListenable:
-      AuthServiceListener(), //escucha de cambios en el servicio de autenticación
+  initialLocation: '/', //ruta inicial
+  refreshListenable: AuthServiceListener(),
   redirect: (context, state) async {
     final authService = Provider.of<AuthService>(context, listen: false);
-    final isLoggedIn =
-        authService.isLoggedIn; //verifica si el usuario está autenticado
+    final isLoggedIn = authService.isLoggedIn;
 
-    //redirige si el usuario no está logueado y no está en la ruta '/':
+    // redirige si el usuario no está logueado y no está en la ruta '/':
     if (!isLoggedIn && state.matchedLocation != '/') {
-      return '/'; //redirige a la pantalla de login
+      return '/';
     }
-
     //si está logueado y está en la ruta '/', redirige a la página correspondiente
     if (isLoggedIn && state.matchedLocation == '/') {
       final isGoalExisting =
           await Provider.of<AuthService>(context, listen: false).hasInputText();
       return isGoalExisting ? '/home' : '/chat';
     }
-
-    return null; //no redirige
+    return null;
   },
   routes: [
-    //ruta de autenticación
     GoRoute(path: '/', builder: (context, state) => const AuthScreen()),
-
-    //ruta de la shell (contiene la navegación principal)
     ShellRoute(
       builder: (context, state, child) => MainScaffold(child: child),
       routes: [
-        //ruta principal 'home'
         GoRoute(
           path: '/home',
           builder: (context, state) {
@@ -78,12 +71,10 @@ final GoRouter _router = GoRouter(
             return HomeScreen(day: currentDay);
           },
         ),
-        //ruta del plan de comidas
         GoRoute(
           path: '/mealplan',
           builder: (context, state) => const MealPlanScreen(),
         ),
-        //ruta para cambiar recetas
         GoRoute(
           path: '/changereceipe',
           builder:
@@ -94,21 +85,17 @@ final GoRouter _router = GoRouter(
                 day: '',
               ),
         ),
-        //ruta de detalles de una receta
         GoRoute(
           path: '/receipe',
           builder:
               (context, state) =>
                   const MealScreen(mealData: {}, day: '', title: ''),
         ),
-        //ruta para los ejercicios
         GoRoute(
           path: '/workout',
           builder: (context, state) => const WorkoutScreen(),
         ),
-        //ruta para el chat
         GoRoute(path: '/chat', builder: (context, state) => const ChatScreen()),
-        //ruta para la configuración
         GoRoute(
           path: '/settings',
           builder: (context, state) => SettingsScreen(),
@@ -136,12 +123,10 @@ class HealthyGoalsApp extends StatelessWidget {
   }
 }
 
-//listener de authservice que notifica a los widgets cuando el estado de autenticación cambia
+// listener de authservice que notifica a los widgets cuando el estado de autenticación cambia
 class AuthServiceListener extends ChangeNotifier {
   AuthServiceListener() {
-    _authService.addListener(
-      notifyListeners,
-    ); //escucha los cambios en authservice
+    _authService.addListener(notifyListeners);
   }
 
   final _authService = AuthService();

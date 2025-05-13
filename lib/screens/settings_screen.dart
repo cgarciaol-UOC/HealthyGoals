@@ -17,9 +17,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
-    final settingsNotifier = Provider.of<SettingsNotifier>(
-      context,
-    ); // Obtenemos el estado de Dark Mode
+    final settingsNotifier = Provider.of<SettingsNotifier>(context);
 
     return Scaffold(
       backgroundColor: customColors.backgroundColor,
@@ -33,32 +31,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Dark Mode toggle
+            // es el toggle de dark mode
             SwitchListTile(
               title: const Text('Dark Mode'),
               value: settingsNotifier.isDarkModeEnabled,
               onChanged: (value) {
-                settingsNotifier
-                    .toggleDarkMode(); // Alternamos el valor de dark mode
+                settingsNotifier.toggleDarkMode();
               },
               activeColor: customColors.buttonColor,
               inactiveTrackColor: const Color(0xFFBDBDBD),
               inactiveThumbColor: const Color(0xFF9E9E9E),
             ),
-            // Notifications toggle
+            // es el toggle de notificaciones
             SwitchListTile(
               title: const Text('Notifications'),
               value: settingsNotifier.isNotificationsEnabled,
               onChanged: (value) {
-                settingsNotifier
-                    .toggleNotifications(); // Alternamos el valor de las notificaciones
+                settingsNotifier.toggleNotifications();
               },
               activeColor: customColors.buttonColor,
               inactiveTrackColor: const Color(0xFFBDBDBD),
               inactiveThumbColor: const Color(0xFF9E9E9E),
             ),
             const SizedBox(height: 34),
-            // Logout button
             const LogoutButton(),
           ],
         ),
@@ -78,12 +73,9 @@ class LogoutButton extends StatelessWidget {
         onPressed: () async {
           try {
             await FirebaseAuth.instance.signOut();
-            // Redirigir a la pantalla de login después de hacer logout
-            GoRouter.of(
-              context,
-            ).go('/login'); // Redirección explícita a la pantalla de login
+            // redirige al usuario a la pantalla de login
+            GoRouter.of(context).go('/login');
           } catch (e) {
-            // Si hay un error, puedes mostrar un mensaje
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Error al cerrar sesión: $e')),
             );
@@ -91,13 +83,13 @@ class LogoutButton extends StatelessWidget {
         },
         style: TextButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-          backgroundColor: customColors.buttonColor, // Color consistente del botón
+          backgroundColor: customColors.buttonColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: Text(
           'Logout',
           style: TextStyle(
-            color: customColors.backgroundColorSame, // Texto en blanco para contraste
+            color: customColors.backgroundColorSame,
             fontSize: 16,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w600,

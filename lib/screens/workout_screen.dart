@@ -16,9 +16,10 @@ class Exercise {
     required this.imageUrl,
   });
 
+  // aqui se crea un objeto Exercise con los campos del json
   factory Exercise.fromJson(Map<String, dynamic> json) {
-    final instructions = (json['instructions'] as List<dynamic>?)
-            ?.join('\n') ??
+    final instructions =
+        (json['instructions'] as List<dynamic>?)?.join('\n') ??
         'No instructions available';
 
     final List<dynamic>? images = json['images'];
@@ -53,15 +54,17 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     fetchExercisesFromFirestore();
   }
 
+  // aqui se cargan los ejercicios desde firestore
   Future<void> fetchExercisesFromFirestore() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) throw Exception("No user logged in");
 
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
+      final doc =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get();
 
       final data = doc.data();
       if (data == null || data['exercises'] == null) {
@@ -71,10 +74,12 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
       final List<dynamic> exercisesJson = data['exercises'];
 
       setState(() {
-        exercises = exercisesJson
-            .map((json) => Exercise.fromJson(Map<String, dynamic>.from(json)))
-            .toList();
-            print(exercises);
+        exercises =
+            exercisesJson
+                .map(
+                  (json) => Exercise.fromJson(Map<String, dynamic>.from(json)),
+                )
+                .toList();
         _isLoading = false;
       });
     } catch (e) {
@@ -83,18 +88,19 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     }
   }
 
+  // se cargan unos ejercicios de prueba si no se pueden cargar desde firestore
   void _loadFallbackExercises() {
     final fallback = [
       {
         "name": "Push Ups",
         "instructions": ["3 sets of 15 reps"],
-        "images": []
+        "images": [],
       },
       {
         "name": "Squats",
         "instructions": ["3 sets of 20 reps"],
-        "images": []
-      }
+        "images": [],
+      },
     ];
 
     setState(() {
@@ -111,34 +117,37 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
       body: Container(
         color: customColors.backgroundColor,
         padding: const EdgeInsets.all(16),
-        child: _isLoading
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                          customColors.buttonColor),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Cargando ejercicios...',
-                      style: TextStyle(color: customColors.textColor),
-                    ),
-                  ],
-                ),
-              )
-            : ListView(
-                children: exercises
-                    .map(
-                      (exercise) => ExerciseCard(
-                        name: exercise.name,
-                        description: exercise.description,
-                        imageUrl: exercise.imageUrl,
+        child:
+            _isLoading
+                ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          customColors.buttonColor,
+                        ),
                       ),
-                    )
-                    .toList(),
-              ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Cargando ejercicios...',
+                        style: TextStyle(color: customColors.textColor),
+                      ),
+                    ],
+                  ),
+                )
+                : ListView(
+                  children:
+                      exercises
+                          .map(
+                            (exercise) => ExerciseCard(
+                              name: exercise.name,
+                              description: exercise.description,
+                              imageUrl: exercise.imageUrl,
+                            ),
+                          )
+                          .toList(),
+                ),
       ),
     );
   }

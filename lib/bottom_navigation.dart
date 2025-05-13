@@ -13,7 +13,6 @@ class BottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     final customColors = Theme.of(context).extension<CustomColors>()!;
     return ClipRRect(
       borderRadius: const BorderRadius.only(
@@ -21,6 +20,7 @@ class BottomNavigation extends StatelessWidget {
         topRight: Radius.circular(20),
       ),
       child: BottomNavigationBar(
+        // barra de navegación
         type: BottomNavigationBarType.fixed,
         backgroundColor: customColors.backgroundColor,
         elevation: 10,
@@ -29,10 +29,8 @@ class BottomNavigation extends StatelessWidget {
         currentIndex: selectedIndex,
         onTap: onItemTapped,
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          // elementos de la barra
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.fastfood_sharp),
             label: 'MealPlan',
@@ -41,10 +39,7 @@ class BottomNavigation extends StatelessWidget {
             icon: Icon(Icons.fitness_center),
             label: 'Workout',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.message),
-            label: 'Chat',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Chat'),
         ],
       ),
     );

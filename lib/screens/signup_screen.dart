@@ -27,44 +27,42 @@ class _SignUpState extends State<SignUp> {
     try {
       final email = emailController.text;
       final password = passwordController.text;
-
+      // si los campos estan vacios muestra un mensaje de error
       if (email.isEmpty || password.isEmpty) {
         setState(() {
-          errorMessage = 'Todos los campos son obligatorios';
+          errorMessage = 'All fields are required';
         });
         return;
       }
-
+      // si el email no es valido muestra un mensaje de error
       if (!RegExp(
         r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
       ).hasMatch(email)) {
         setState(() {
-          errorMessage = 'Por favor ingrese un correo electrónico válido.';
+          errorMessage = 'Please enter a valid email address.';
         });
         return;
       }
 
       if (password.length < 6) {
         setState(() {
-          errorMessage = 'La contraseña debe tener al menos 6 caracteres.';
+          errorMessage = 'Password must be at least 6 characters long.';
         });
         return;
       }
-
+      // se crea el usuario en firebase
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Usuario creado con éxito')));
-      GoRouter.of(
-        context,
-      ).go('/home'); // Redirigir al usuario después del registro
+      // si se ha creado correctamente redirige al usuario a la pantalla de home
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User successfully created')),
+      );
+      GoRouter.of(context).go('/home');
     } on FirebaseAuthException catch (e) {
       setState(() {
-        errorMessage = e.message ?? 'Hubo un error al crear el usuario';
+        errorMessage = e.message ?? 'There was an error creating the user';
       });
     } finally {
       setState(() {

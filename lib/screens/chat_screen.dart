@@ -1,4 +1,3 @@
-// Importaciones necesarias
 import 'dart:convert'; // Para convertir objetos a JSON y viceversa
 import 'package:cloud_firestore/cloud_firestore.dart'; // Para acceder a Firestore y guardar los datos del usuario
 import 'package:firebase_auth/firebase_auth.dart'; // Para manejar la autenticación de Firebase
@@ -6,9 +5,8 @@ import 'package:flutter/material.dart'; // Para la UI en Flutter
 import 'package:healthy_goals/custom_theme.dart';
 import 'package:healthy_goals/services/auth_service.dart'; // Servicio para la autenticación personalizada
 import 'package:http/http.dart' as http; // Para hacer peticiones HTTP
-import '../top_bar.dart'; // Barra superior común
+import '../top_bar.dart';
 
-// Pantalla de chat donde el usuario puede especificar sus objetivos
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
 
@@ -17,25 +15,20 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  AuthService authService =
-      AuthService(); // Instancia de AuthService para la autenticación
-  final TextEditingController inputTextController =
-      TextEditingController(); // Controlador para el texto ingresado
-  bool?
-  hasExistingGoals; // Variable para verificar si el usuario ya tiene objetivos
-  bool isLoading = false; // Para gestionar el estado de carga
+  AuthService authService = AuthService();
+  final TextEditingController inputTextController = TextEditingController();
+  bool? hasExistingGoals;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    checkExistingGoals(); // Verificar si el usuario tiene objetivos al iniciar
+    checkExistingGoals();
   }
 
-  // Verifica si el usuario ya tiene objetivos especificados
+  // verifica si el usuario ya tiene los objetivos especificados (el prompt)
   Future<void> checkExistingGoals() async {
-    final result =
-        await authService
-            .hasInputText(); // Consulta si el usuario tiene objetivos guardados
+    final result = await authService.hasInputText();
     setState(() {
       hasExistingGoals = result;
     });
@@ -44,27 +37,20 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
-    final bool? goals =
-        hasExistingGoals; // Variable para manejar la condición de si el usuario tiene objetivos
-
-    // Si estamos verificando los objetivos o cargando, mostramos un indicador de carga
+    final bool? goals = hasExistingGoals;
+    // si se está verificando el prompt o cargando, se muestra un spinner
     if (goals == null || isLoading) {
       return Scaffold(
         body: Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(
-              customColors.buttonColor,
-            ), // Usando el color del tema
+            valueColor: AlwaysStoppedAnimation<Color>(customColors.buttonColor),
           ),
-        ), // Indicador de carga
+        ),
         bottomNavigationBar: null,
       );
     } else {
       return Scaffold(
-        appBar: CommonAppBar(
-          title: 'Healthy Goals', // Título de la app en la barra
-          showBackButton: false, // No mostramos el botón de retroceso
-        ),
+        appBar: CommonAppBar(title: 'Healthy Goals', showBackButton: false),
         backgroundColor: customColors.backgroundColor,
         body: SafeArea(
           child: SingleChildScrollView(
@@ -73,7 +59,6 @@ class _ChatScreenState extends State<ChatScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 16),
-                // Título de la pantalla, cambia según si el usuario tiene objetivos o no
                 Text(
                   goals ? 'Change your goals' : 'Specify your goals',
                   style: TextStyle(
@@ -84,7 +69,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Descripción de la pantalla, también cambia según si el usuario tiene objetivos
                 Text(
                   goals
                       ? 'Edit your goals, be careful you cannot restart your old input once you click on submit!'
@@ -98,7 +82,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                // Caja de texto para ingresar los objetivos
                 Container(
                   width: double.infinity,
                   height: 240,
@@ -108,13 +91,10 @@ class _ChatScreenState extends State<ChatScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: TextField(
-                    controller: inputTextController, // Controlador de texto
-                    maxLines: null, // Permite múltiples líneas
+                    controller: inputTextController,
+                    maxLines: null, // permite múltiples líneas
                     decoration: InputDecoration(
-                      hintText:
-                          goals
-                              ? 'I want...'
-                              : 'What do you want?', // Texto de ayuda
+                      hintText: goals ? 'I want...' : 'What do you want?',
                       border: InputBorder.none,
                     ),
                     style: TextStyle(
@@ -123,16 +103,16 @@ class _ChatScreenState extends State<ChatScreen> {
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w400,
                     ),
-                    textAlign: TextAlign.center, // Centrado del texto
+                    textAlign: TextAlign.center,
                   ),
                 ),
                 const SizedBox(height: 32),
-                // Botón para enviar los objetivos
+                // este es el botón para enviar los objetivos
                 SizedBox(
                   width: double.infinity,
                   height: 54,
                   child: ElevatedButton(
-                    onPressed: sendGoals, // Método para enviar los objetivos
+                    onPressed: sendGoals,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: customColors.buttonColor,
                       shape: RoundedRectangleBorder(
@@ -140,7 +120,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                     ),
                     child: Text(
-                      'SUBMIT', // Texto del botón
+                      'SUBMIT',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -159,15 +139,14 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  // Método para guardar los objetivos y hacer la petición al backend
+  // metodo para guardar el prompt y hacer la petición al backend
   Future<void> sendGoals() async {
-    final user = FirebaseAuth.instance.currentUser; // Obtiene el usuario actual
+    final user = FirebaseAuth.instance.currentUser;
 
-    // Validación para asegurarse de que el campo de texto no esté vacío
     if (inputTextController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please write your goals before submitting!'),
+          content: Text('Please write your goals before submitting'),
           backgroundColor: Colors.red,
         ),
       );
@@ -176,17 +155,17 @@ class _ChatScreenState extends State<ChatScreen> {
 
     if (user != null) {
       try {
-        // Verificar si el backend está disponible
+        // verifica si el backend está disponible
         final headResponse = await http
             .head(Uri.parse('https://healthygoals.onrender.com/'))
             .timeout(const Duration(seconds: 2));
 
         if (headResponse.statusCode == 200) {
           setState(() {
-            isLoading = true; // Mostrar spinner de carga
+            isLoading = true;
           });
 
-          // Enviar los objetivos al backend (FastAPI)
+          // envia el prompt al backend
           final response = await http
               .post(
                 Uri.parse('https://healthygoals.onrender.com/analizar-texto/'),
@@ -197,48 +176,32 @@ class _ChatScreenState extends State<ChatScreen> {
 
           if (response.statusCode == 200) {
             final result = jsonDecode(response.body);
+            // obtiene todos los ejercicios
             final ejerciciosUrl = Uri.parse(
               'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/exercises.json',
             );
             final ejerciciosResponse = await http.get(ejerciciosUrl);
 
             List<dynamic> allExercises = [];
-
             if (ejerciciosResponse.statusCode == 200) {
               allExercises = jsonDecode(ejerciciosResponse.body);
             }
+            //TODO filtrar por objetivo
 
-            // Filtrado simple según el objetivo
-            /*final Map<String, List<String>> objetivoToBodyParts = {
-                'perder_peso': ['cardio', 'lower legs', 'upper legs'],
-                'ganar_musculo': ['chest', 'upper arms', 'back', 'shoulders'],
-                'mantener_peso': ['core', 'cardio', 'upper legs']
-              };
-
-              final partesPermitidas = objetivoToBodyParts[result['objetivo']] ?? [];
-
-              ejerciciosFiltrados = allExercises.where((exercise) {
-                final bodyPart = exercise['bodyPart']?.toString().toLowerCase();
-                return partesPermitidas.contains(bodyPart);
-              }).toList();
-            }
-            print(ejerciciosFiltrados);*/
-
-            // Guardar los resultados en Firestore
+            // guarda los resultados en Firestore
             await FirebaseFirestore.instance
                 .collection('users')
                 .doc(user.uid)
                 .set({
-                  'inputText': inputTextController.text, // Objetivo del usuario
-                  'recipes': result['recipes'], // Recetas generadas
-                  'semanal_planning':
-                      result['semanal_planning'], // Plan semanal
-                  'exercises': allExercises, // Aquí se guardan los ejercicios
+                  'inputText': inputTextController.text,
+                  'recipes': result['recipes'],
+                  'semanal_planning': result['semanal_planning'],
+                  'exercises': allExercises,
                 }, SetOptions(merge: true));
             setState(() {
-              isLoading = false; // Detener spinner de carga
+              isLoading = false;
             });
-            // Mostrar mensaje de éxito
+
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Goals saved successfully!'),
@@ -247,9 +210,9 @@ class _ChatScreenState extends State<ChatScreen> {
             );
           } else {
             setState(() {
-              isLoading = false; // Detener spinner de carga
+              isLoading = false;
             });
-            // Error al procesar los objetivos
+            // error
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
@@ -262,9 +225,9 @@ class _ChatScreenState extends State<ChatScreen> {
         }
       } catch (e) {
         setState(() {
-          isLoading = false; // Detener spinner de carga
+          isLoading = false;
         });
-        // Error general al conectar con el backend
+        // error
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('An error occurred: $e'),

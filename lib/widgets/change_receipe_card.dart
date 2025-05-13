@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:healthy_goals/custom_theme.dart';
 
-
 class RecipeCard extends StatelessWidget {
   final String title;
   final String imageUrl;
@@ -30,7 +29,7 @@ class RecipeCard extends StatelessWidget {
             fontSize: 16,
             fontWeight: FontWeight.w600,
             fontFamily: 'Poppins',
-            color: customColors.backgroundColorSame
+            color: customColors.textColor,
           ),
         ),
       ],

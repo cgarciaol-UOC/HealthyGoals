@@ -23,7 +23,6 @@ class ExerciseCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
         side: BorderSide(
-          // Aquí defines el borde
           color: customColors.iconColor.withOpacity(0.5),
           width: 2.0,
         ),
@@ -32,26 +31,20 @@ class ExerciseCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         child: Row(
           children: [
-            // Imagen
             imageUrl.isNotEmpty
                 ? Container(
-                  height: 120, // Ajusta la altura de la imagen
-                  width: 120, // Puedes ajustar el ancho si lo deseas
+                  height: 120,
+                  width: 120,
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: NetworkImage(imageUrl),
-                      fit:
-                          BoxFit
-                              .contain, // Ajusta la imagen para cubrir el contenedor
+                      fit: BoxFit.contain,
                     ),
                     borderRadius: BorderRadius.circular(10),
                   ),
                 )
-                : const Icon(
-                  Icons.fitness_center,
-                  size: 50, // Tamaño del ícono si no hay imagen
-                ),
-            const SizedBox(width: 16), // Espaciado entre la imagen y el texto
+                : const Icon(Icons.fitness_center, size: 50),
+            const SizedBox(width: 16),
             // Texto
             Expanded(
               child: Column(

@@ -40,24 +40,23 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
     _loadWeeklyPlan();
   }
 
+  // funcion para cargar el plan semanal del backend
   Future<void> _loadWeeklyPlan() async {
     try {
       final plan = await dietService.getWeeklyPlan();
-      print('Respuesta del backend: $plan');
-
       if (plan != null) {
         setState(() {
           weeklyPlan = plan;
         });
       }
     } catch (e) {
-      // Manejo de errores en caso de que la carga falle
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error al cargar el plan semanal')),
+        const SnackBar(content: Text('Error on loading semanal planning')),
       );
     }
   }
 
+  // funcion para normalizar los ingredientes si es necesario
   String normalizeIngredient(String ingredient) {
     ingredient = ingredient.toLowerCase();
     if (ingredient.endsWith('s')) {
@@ -68,25 +67,21 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
 
   Future<void> showShopListPopover() async {
     if (weeklyPlan == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No se encontraron datos para el plan semanal'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No data found')));
       return;
     }
 
     final Map<String, dynamic> shopList = {};
-
+    // aqui se generan los ingredientes de la lista de la compra
     weeklyPlan?.forEach((day, meals) {
       if (meals is Map<String, dynamic>) {
         meals.forEach((mealType, mealData) {
           if (mealData is Map<String, dynamic>) {
             final mealObj = Meal.fromJson(mealData, mealType);
-
             mealObj.ingredients.forEach((ingredient, measure) {
               final normalizedIngredient = normalizeIngredient(ingredient);
-
               if (shopList.containsKey(normalizedIngredient)) {
                 shopList[normalizedIngredient] =
                     shopList[normalizedIngredient]! + measure;
@@ -98,9 +93,7 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
         });
       }
     });
-
-    print('Lista de la compra generada: $shopList');
-
+    //aqui se muestra el popover con la lista de la compra
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -152,11 +145,9 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
       return Scaffold(
         body: Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(
-              customColors.buttonColor,
-            ), // Usando el color del tema
+            valueColor: AlwaysStoppedAnimation<Color>(customColors.buttonColor),
           ),
-        ), // Indicador de carga
+        ),
         bottomNavigationBar: null,
       );
     } else {
