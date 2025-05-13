@@ -139,7 +139,7 @@ def translate_text(text, target_lang="es"):
 
 #function to generate a weekly plan from recipe data
 def generarate_weekly_plan(recipes):
-    week_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    week_days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
     meals = ["breakfast", "lunch", "snack", "dinner"]
     weekly_plan = {}
 

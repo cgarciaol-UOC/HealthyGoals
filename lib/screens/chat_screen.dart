@@ -52,7 +52,9 @@ class _ChatScreenState extends State<ChatScreen> {
       return Scaffold(
         body: Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(customColors.buttonColor), // Usando el color del tema
+            valueColor: AlwaysStoppedAnimation<Color>(
+              customColors.buttonColor,
+            ), // Usando el color del tema
           ),
         ), // Indicador de carga
         bottomNavigationBar: null,
@@ -189,13 +191,15 @@ class _ChatScreenState extends State<ChatScreen> {
               .post(
                 Uri.parse('https://healthygoals.onrender.com/analizar-texto/'),
                 headers: {'Content-Type': 'application/json'},
-                body: jsonEncode({'texto': inputTextController.text}),
+                body: jsonEncode({'text': inputTextController.text}),
               )
               .timeout(const Duration(seconds: 30));
 
           if (response.statusCode == 200) {
             final result = jsonDecode(response.body);
-            final ejerciciosUrl = Uri.parse('https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/exercises.json');
+            final ejerciciosUrl = Uri.parse(
+              'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/exercises.json',
+            );
             final ejerciciosResponse = await http.get(ejerciciosUrl);
 
             List<dynamic> allExercises = [];
@@ -204,8 +208,8 @@ class _ChatScreenState extends State<ChatScreen> {
               allExercises = jsonDecode(ejerciciosResponse.body);
             }
 
-              // Filtrado simple según el objetivo
-              /*final Map<String, List<String>> objetivoToBodyParts = {
+            // Filtrado simple según el objetivo
+            /*final Map<String, List<String>> objetivoToBodyParts = {
                 'perder_peso': ['cardio', 'lower legs', 'upper legs'],
                 'ganar_musculo': ['chest', 'upper arms', 'back', 'shoulders'],
                 'mantener_peso': ['core', 'cardio', 'upper legs']
