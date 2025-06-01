@@ -196,12 +196,13 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
                     final mealData = meals[mealType];
                     if (mealData is Map<String, dynamic>) {
                       final mealName = mealData['strMeal'] ?? 'No name';
-                      description += '$mealType: $mealName\n';
+                      description += '$mealType: $mealName\n\n';
                     }
                   } else {
                     description += '$mealType: (no disponible)\n';
                   }
                 }
+
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 10),
                   child: DailyMealCard(

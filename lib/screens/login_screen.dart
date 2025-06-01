@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:healthy_goals/services/auth_service.dart';
 
+import '../custom_theme.dart';
+
 class LogIn extends StatefulWidget {
   final VoidCallback onToggle;
   const LogIn({super.key, required this.onToggle});
@@ -42,6 +44,7 @@ class _LogInState extends State<LogIn> {
 
   @override
   Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: SizedBox(
@@ -51,10 +54,10 @@ class _LogInState extends State<LogIn> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 100),
-            const Text(
+            Text(
               'Welcome Back!',
               style: TextStyle(
-                color: Color(0xFF45484D),
+                color: customColors.widgetColor,
                 fontSize: 30,
                 fontWeight: FontWeight.w700,
               ),
@@ -92,10 +95,10 @@ class _LogInState extends State<LogIn> {
             Center(
               child: TextButton(
                 onPressed: widget.onToggle,
-                child: const Text.rich(
+                child: Text.rich(
                   TextSpan(
                     children: [
-                      TextSpan(
+                      const TextSpan(
                         text: 'New User? ',
                         style: TextStyle(
                           color: Color(0xFF6A6A6A),
@@ -105,7 +108,7 @@ class _LogInState extends State<LogIn> {
                       TextSpan(
                         text: 'Create Account',
                         style: TextStyle(
-                          color: Color(0xFF45484D),
+                          color: customColors.widgetColor,
                           fontSize: 16,
                         ),
                       ),
@@ -134,23 +137,52 @@ class _LogInState extends State<LogIn> {
     TextEditingController controller, {
     bool obscure = false,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: TextField(
-        controller: controller,
-        obscureText: obscure,
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+    bool _obscureText = obscure;
+
+    return StatefulBuilder(
+      builder: (BuildContext context, StateSetter setState) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
           ),
-          hintText: hint,
-          border: InputBorder.none,
-        ),
-      ),
+          child: TextField(
+            controller: controller,
+            obscureText: _obscureText,
+            style: TextStyle(
+              color: customColors.iconColor,
+              fontSize: 14,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w400,
+            ),
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+              hintText: hint,
+              border: InputBorder.none,
+              suffixIcon:
+                  obscure
+                      ? IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: customColors.iconColor,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                      )
+                      : null,
+            ),
+          ),
+        );
+      },
     );
   }
 }

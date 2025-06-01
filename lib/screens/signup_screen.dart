@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 
+import '../custom_theme.dart';
+
 class SignUp extends StatefulWidget {
   final VoidCallback onToggle;
 
@@ -59,7 +61,7 @@ class _SignUpState extends State<SignUp> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('User successfully created')),
       );
-      GoRouter.of(context).go('/home');
+      GoRouter.of(context).go('/chat');
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message ?? 'There was an error creating the user';
@@ -73,6 +75,7 @@ class _SignUpState extends State<SignUp> {
 
   @override
   Widget build(BuildContext context) {
+    final customColors = Theme.of(context).extension<CustomColors>()!;
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: SizedBox(
@@ -82,10 +85,10 @@ class _SignUpState extends State<SignUp> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 100),
-            const Text(
+            Text(
               'Register Account',
               style: TextStyle(
-                color: Color(0xFF45484D),
+                color: customColors.widgetColor,
                 fontSize: 30,
                 fontWeight: FontWeight.w600,
               ),
@@ -128,10 +131,10 @@ class _SignUpState extends State<SignUp> {
             Center(
               child: TextButton(
                 onPressed: widget.onToggle,
-                child: const Text.rich(
+                child: Text.rich(
                   TextSpan(
                     children: [
-                      TextSpan(
+                      const TextSpan(
                         text: 'Already Have Account? ',
                         style: TextStyle(
                           color: Color(0xFF6A6A6A),
@@ -141,7 +144,7 @@ class _SignUpState extends State<SignUp> {
                       TextSpan(
                         text: 'Log In',
                         style: TextStyle(
-                          color: Color(0xFF45484D),
+                          color: customColors.widgetColor,
                           fontSize: 16,
                         ),
                       ),
@@ -169,23 +172,51 @@ class _SignUpState extends State<SignUp> {
     TextEditingController controller, {
     bool obscure = false,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: TextField(
-        controller: controller,
-        obscureText: obscure,
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
+    final customColors = Theme.of(context).extension<CustomColors>()!;
+    bool _obscureText = obscure;
+    return StatefulBuilder(
+      builder: (BuildContext context, StateSetter setState) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
           ),
-          hintText: hint,
-          border: InputBorder.none,
-        ),
-      ),
+          child: TextField(
+            controller: controller,
+            obscureText: _obscureText,
+            style: TextStyle(
+              color: customColors.iconColor,
+              fontSize: 14,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w400,
+            ),
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+              hintText: hint,
+              border: InputBorder.none,
+              suffixIcon:
+                  obscure
+                      ? IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: customColors.iconColor,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                      )
+                      : null,
+            ),
+          ),
+        );
+      },
     );
   }
 }

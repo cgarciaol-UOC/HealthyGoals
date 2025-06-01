@@ -19,7 +19,7 @@ class DailyMealCard extends StatelessWidget {
       child: FractionallySizedBox(
         widthFactor: 0.95, // ocupa el 95% del w de la pantalla
         child: SizedBox(
-          height: 122,
+          height: 232,
           child: Stack(
             children: [
               Positioned.fill(
@@ -46,7 +46,7 @@ class DailyMealCard extends StatelessWidget {
               ),
               // día
               Positioned(
-                left: 19,
+                left: 15,
                 top: 27,
                 child: Text(
                   day[0].toUpperCase() + day.substring(1),

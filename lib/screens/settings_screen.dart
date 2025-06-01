@@ -42,12 +42,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
               inactiveTrackColor: const Color(0xFFBDBDBD),
               inactiveThumbColor: const Color(0xFF9E9E9E),
             ),
-            // es el toggle de notificaciones
             SwitchListTile(
               title: const Text('Notifications'),
               value: settingsNotifier.isNotificationsEnabled,
               onChanged: (value) {
-                settingsNotifier.toggleNotifications();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Función aún no implementada.'),
+                    duration: const Duration(seconds: 2),
+                    backgroundColor: customColors.buttonColor,
+                  ),
+                );
               },
               activeColor: customColors.buttonColor,
               inactiveTrackColor: const Color(0xFFBDBDBD),

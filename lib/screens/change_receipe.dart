@@ -31,6 +31,9 @@ class _ChangeRecipeScreenState extends State<ChangeRecipeScreen> {
   int? selectedIndex;
   DietService dietService = DietService();
 
+  TextEditingController searchController = TextEditingController();
+  String searchQuery = '';
+
   @override
   void initState() {
     super.initState();
@@ -59,6 +62,13 @@ class _ChangeRecipeScreenState extends State<ChangeRecipeScreen> {
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>()!;
+
+    final filteredRecipes =
+        recipes.where((recipe) {
+          final title = recipe['title']!.toLowerCase();
+          return title.contains(searchQuery);
+        }).toList();
+
     return Scaffold(
       backgroundColor: customColors.backgroundColor,
       appBar: const CommonAppBar(title: 'Healthy Goals', showBackButton: true),
@@ -66,6 +76,27 @@ class _ChangeRecipeScreenState extends State<ChangeRecipeScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: ListView(
           children: [
+            const SizedBox(height: 16),
+            TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                hintText: 'Search recipe...',
+                prefixIcon: Icon(Icons.search, color: customColors.iconColor),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: customColors.iconColor),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: customColors.buttonColor),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  searchQuery = value.toLowerCase();
+                });
+              },
+            ),
             const SizedBox(height: 16),
             Text(
               'Suggested recipes',
@@ -77,11 +108,11 @@ class _ChangeRecipeScreenState extends State<ChangeRecipeScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            // esta es la vista en cuadrícula para mostrar las recetas
+            // vista en cuadrícula para mostrar las recetas
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: recipes.length,
+              itemCount: filteredRecipes.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 mainAxisSpacing: 20,
@@ -89,15 +120,13 @@ class _ChangeRecipeScreenState extends State<ChangeRecipeScreen> {
                 childAspectRatio: 0.75,
               ),
               itemBuilder: (context, index) {
-                final recipe = recipes[index];
-                final isSelected =
-                    selectedIndex ==
-                    index; // veerifica si la receta está seleccionada
+                final recipe = filteredRecipes[index];
+                final isSelected = selectedIndex == recipes.indexOf(recipe);
 
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      selectedIndex = index; // actualiza el índice seleccionado
+                      selectedIndex = recipes.indexOf(recipe);
                     });
                   },
                   child: Container(
@@ -119,33 +148,15 @@ class _ChangeRecipeScreenState extends State<ChangeRecipeScreen> {
                 );
               },
             ),
-            const SizedBox(height: 24),
-            Center(
-              child: TextButton(
-                onPressed: () {},
-                child: Text(
-                  'Show more...',
-                  style: TextStyle(
-                    color: customColors.iconColor,
-                    fontSize: 14,
-                    fontFamily: 'Poppins',
-                  ),
-                ),
-              ),
-            ),
             const SizedBox(height: 80),
           ],
         ),
       ),
-      // este es el botón flotante para seleccionar la receta
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           if (selectedIndex != null) {
-            final selectedRecipe =
-                recipes[selectedIndex!]; // receta seleccionada
-            await _updateRecipeInFirebase(
-              selectedRecipe,
-            ); // se actualiza la receta en Firebase
+            final selectedRecipe = recipes[selectedIndex!];
+            await _updateRecipeInFirebase(selectedRecipe);
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -153,14 +164,13 @@ class _ChangeRecipeScreenState extends State<ChangeRecipeScreen> {
               ),
             );
           } else {
-            // muestra un mensaje si no se seleccionó ninguna receta
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Please select a recipe first')),
             );
           }
         },
         backgroundColor: customColors.buttonColor,
-        label: Text(
+        label: const Text(
           'Select this recipe',
           style: TextStyle(color: Colors.white),
         ),
