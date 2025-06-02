@@ -63,7 +63,7 @@ diet_keywords = {
     'sin_azucar': ['Dessert', 'Breakfast', 'Miscellaneous'],
 }
 
-#estas son las palabras clave para identificar diferentes objetivos fitness en español
+#estas son las palabras clave para identificar diferentes objetivos fitness
 objective_keywords = {
     'perder_peso': ['perder', 'adelgazar', 'bajar'],
     'ganar_musculo': ['músculo', 'fuerza', 'ganar músculo', 'entrenar fuerza', 'musculación'],
@@ -102,9 +102,13 @@ def search_recipes(diet_detected):
 
     meals = {"meals": []}
     searched_categories = set()
+    max_recipes = 50  #lmite total de recetas para no solapar el firebase gratuito
+    total_recipes = 0
     #translator = GoogleTranslator(source='en', target='es')
     # busca recetas para cada categoría de dieta detectada
     for category in diet_detected:
+        if total_recipes >= max_recipes:
+            break
         lower_category = category.lower()
         if lower_category not in searched_categories:
             searched_categories.add(lower_category)
@@ -114,6 +118,8 @@ def search_recipes(diet_detected):
             if response.status_code == 200 and response.json().get('meals'):
                 data = response.json()
                 for basic_recipe in data['meals']:
+                    if total_recipes >= max_recipes:
+                        break
                     url = f"https://www.themealdb.com/api/json/v1/1/lookup.php?i={basic_recipe['idMeal']}"
                     item_response = requests.get(url)
                     if item_response.status_code == 200:
@@ -122,6 +128,7 @@ def search_recipes(diet_detected):
                             meal_data = item_data['meals'][0]
                             # aqui se llamaria a la funcion translate_text para traducir los elementos de la receta
                             meals["meals"].append(meal_data)
+                            total_recipes += 1
 
         else:
             print("error with url")

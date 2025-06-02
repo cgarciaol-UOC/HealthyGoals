@@ -32,7 +32,7 @@ class AppTheme {
     extensions: const [
       CustomColors(
         buttonColor: Color(0xFFEB5E1B),
-        iconColor: Color.fromARGB(255, 111, 111, 111),
+        iconColor: Color.fromARGB(255, 153, 152, 152),
         textColor: Colors.white,
         backgroundColor: Color(0xFF2F353B),
         appBarColor: Color(0xFF2F353B),

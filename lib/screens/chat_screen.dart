@@ -2,6 +2,7 @@ import 'dart:convert'; // Para convertir objetos a JSON y viceversa
 import 'package:cloud_firestore/cloud_firestore.dart'; // Para acceder a Firestore y guardar los datos del usuario
 import 'package:firebase_auth/firebase_auth.dart'; // Para manejar la autenticación de Firebase
 import 'package:flutter/material.dart'; // Para la UI en Flutter
+import 'package:go_router/go_router.dart';
 import 'package:healthy_goals/custom_theme.dart';
 import 'package:healthy_goals/services/auth_service.dart'; // Servicio para la autenticación personalizada
 import 'package:http/http.dart' as http; // Para hacer peticiones HTTP
@@ -172,7 +173,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 headers: {'Content-Type': 'application/json'},
                 body: jsonEncode({'text': inputTextController.text}),
               )
-              .timeout(const Duration(seconds: 30));
+              .timeout(const Duration(seconds: 60));
 
           if (response.statusCode == 200) {
             final result = jsonDecode(response.body);
@@ -208,6 +209,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 backgroundColor: Colors.green,
               ),
             );
+            GoRouter.of(context).go('/home');
           } else {
             setState(() {
               isLoading = false;
